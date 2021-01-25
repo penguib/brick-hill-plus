@@ -3,6 +3,16 @@ let userId = url.match(/-?[0-9]+/)[0]
 let api = "https://api.brick-hill.com/v1/games/retrieveAvatar?id="
 let hatApi = "https://api.brick-hill.com/v1/shop/"
 
+function generateHTML(item, itemData) {
+    return ` <a href="/shop/${item}">
+                    <div class="profile-card award">
+                        <img src="${itemData.thumbnail}">
+                        <span class="ellipsis">${itemData.name}</span>
+                    </div>
+                </a>
+            `
+}
+
 async function getItemData(id) {
     let data = await fetch(hatApi + id)
     return data.json()
@@ -14,38 +24,28 @@ async function appendItems(data) {
     let zeroCount = 0
     
     for (let hat of data.hats) {
-        if (hat === 0) {
+        if (!hat) {
             ++zeroCount
             continue
         }
+
         let req = await getItemData(hat)
         let hatData = req.data
 
-        s += ` <a href="/shop/${hat}">
-                    <div class="profile-card award">
-                        <img src="${hatData.thumbnail}">
-                        <span class="ellipsis">${hatData.name}</span>
-                    </div>
-                </a>
-            `
+        s += generateHTML(hat, hatData)
     }
 
     for (let item of Object.values(data)) {
         if (isNaN(item)) continue
-        if (item === 0) {
+        if (!item) {
             ++zeroCount
             continue
         }
+        
         let req = await getItemData(item)
         let itemData = req.data
 
-        s += ` <a href="/shop/${item}">
-                    <div class="profile-card award">
-                        <img src="${itemData.thumbnail}">
-                        <span class="ellipsis">${itemData.name}</span>
-                    </div>
-                </a>
-            `
+        s += generateHTML(item, itemData)
     }
     s += `</div>`
 

@@ -6,9 +6,21 @@
     "content_scripts": [
         {
             "matches": [
+                "https://www.brick-hill.com/*"
+            ],
+            "js": ["navbar.js"]
+        },
+        {
+            "matches": [
                 "https://www.brick-hill.com/user/*"
             ],
             "js": ["userProfiles.js"]
+        },
+        {
+            "matches": [
+                "https://www.brick-hill.com/forum/"
+            ],
+            "js": ["forumsHome.js"]
         },
         {
             "matches": [
@@ -21,6 +33,18 @@
                 "https://www.brick-hill.com/settings/"
             ],
             "js": ["settings.js"]
+        },
+        {
+            "matches": [
+                "https://www.brick-hill.com/shop/*"
+            ],
+            "js": ["itemPage.js"]
+        },
+        {
+            "matches": [
+                "https://www.brick-hill.com/customize/"
+            ],
+            "js": [ "jquery.js", "avatar.js" ]
         }
     ],
     "icons": {
