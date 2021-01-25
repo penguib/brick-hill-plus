@@ -15,6 +15,12 @@
                 "https://www.brick-hill.com/forum/thread/*"
             ],
             "js": ["forums.js"]
+        },
+        {
+            "matches": [
+                "https://www.brick-hill.com/settings/"
+            ],
+            "js": ["settings.js"]
         }
     ],
     "icons": {

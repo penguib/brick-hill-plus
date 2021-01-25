@@ -10,9 +10,14 @@ async function getItemData(id) {
 
 async function appendItems(data) {
     let s = `<div class="top blue">Wearing</div> <div class="content" style="text-align:center;">`
+    // counting to see if the user is wearing anything at all
+    let zeroCount = 0
     
     for (let hat of data.hats) {
-        if (hat === 0) continue
+        if (hat === 0) {
+            ++zeroCount
+            continue
+        }
         let req = await getItemData(hat)
         let hatData = req.data
 
@@ -26,7 +31,11 @@ async function appendItems(data) {
     }
 
     for (let item of Object.values(data)) {
-        if (item === 0 || isNaN(item)) continue
+        if (isNaN(item)) continue
+        if (item === 0) {
+            ++zeroCount
+            continue
+        }
         let req = await getItemData(item)
         let itemData = req.data
 
@@ -38,12 +47,20 @@ async function appendItems(data) {
                 </a>
             `
     }
-
     s += `</div>`
+
+    if (zeroCount === 12)
+        return null
+
     return s
 }
 
 if (userId) {
+
+    if (userId == 127118) {
+        let username = document.getElementsByClassName("ellipsis")[3]
+        username.innerHTML += "   <img src='https://images.emojiterra.com/twitter/512px/1f1e7-1f1e9.png' style='height:20px'>"
+    }
 
     fetch(api + userId)
     .then(res => res.json())
@@ -54,8 +71,10 @@ if (userId) {
 
         // wait for the html then append it to the DOM
         appendItems(data.items).then(html => {
-            card.innerHTML = html
-            mainDiv.appendChild(card)
+            if (html) {
+                card.innerHTML = html
+                mainDiv.appendChild(card)
+            }
         })
     })
 }
