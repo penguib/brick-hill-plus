@@ -31,4 +31,5 @@ card.innerHTML = `
 </div>
 </div>`
 
+
 div.appendChild(card)

@@ -1,6 +1,6 @@
 {
     "name": "Brick Hill+",
-    "version": "1.0",
+    "version": "1.0.1",
     "description": "placeholder v2",
     "manifest_version": 2,
     "content_scripts": [
@@ -8,7 +8,7 @@
             "matches": [
                 "https://www.brick-hill.com/*"
             ],
-            "js": ["navbar.js"]
+            "js": [ "jquery.js", "tradeNotifier.js", "navbar.js" ]
         },
         {
             "matches": [
@@ -20,13 +20,19 @@
             "matches": [
                 "https://www.brick-hill.com/forum/"
             ],
-            "js": ["forumsHome.js"]
+            "js": ["forums/forumsHome.js"]
         },
         {
             "matches": [
                 "https://www.brick-hill.com/forum/thread/*"
             ],
-            "js": ["forums.js"]
+            "js": ["forums/forums.js"]
+        },
+        {
+            "matches": [
+                "https://www.brick-hill.com/forum/*"
+            ],
+            "js": ["forums/allForums.js"]
         },
         {
             "matches": [
@@ -51,5 +57,9 @@
         "16":"./icons/PLUS16.png",
         "48":"./icons/PLUS48.png",
         "128":"./icons/PLUS.png"
-    }
+    },
+    "background": {
+        "scripts": ["jquery.js","background.js"]
+    },
+    "permissions": ["notifications"]
 }

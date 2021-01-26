@@ -2,7 +2,8 @@ let threads = document.getElementsByClassName("thread-row")
 let replies = document.getElementsByClassName("p")
 
 const userApi = "https://api.brick-hill.com/v1/user/profile?id="
-const imgurRegex = /https:\/\/(i.)?imgur.com(\/a|\/gallery)?\/[0-9a-zA-Z]+(.png|.gif|.jpg|.jpeg)?/
+const imgurRegex = /https:\/\/(i.)?imgur.com(\/a|\/gallery)?\/[0-9a-zA-Z]+(.png|.gif|.jpg|.jpeg)/
+const discordRegex = /https:\/\/cdn\.discordapp\.com\/attachments\/[0-9]+\/[0-9]+\/[a-zA-Z0-9]+(.png|.gif|.jpg|.jpeg)/
 
 async function getRawImage(link) {
     let data = await fetch(link, {
@@ -33,12 +34,12 @@ for (let thread of threads) {
 }
 
 for (let reply of replies) {
-    let match = reply.innerText.match(imgurRegex)
+    let match = reply.innerText.match(imgurRegex) || reply.innerText.match(discordRegex)
     if (!match) continue
 
-    if (match[0].includes("/gallery/") || match[0].includes("/a/")) {
-        let data = getRawImage(match[0]).then(data => console.log(data))
-    }
+    // if (match[0].includes("/gallery/") || match[0].includes("/a/")) {
+    //     let data = getRawImage(match[0]).then(data => console.log(data))
+    // }
 
     let img = document.createElement("img")
     img.src = match[0]
@@ -46,5 +47,3 @@ for (let reply of replies) {
     
     reply.appendChild(img)
 }
-
-//https://imgur.com/gallery/xcFOBp7
