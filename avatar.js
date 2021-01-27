@@ -1,3 +1,5 @@
+// thank you to Dragonian for the code
+
 const csrfToken = $("meta[name='csrf-token']").attr("content")
 
 function errorModal(msg) {
@@ -62,6 +64,26 @@ $(document).ready(() => {
     })
 
     $(".colorPallete").attr("class", "newColorPallette") // Rename button classes to not interfere with site.js
-
-    $(document).on("click", ".newColorPallette", t => newChangeColor($(t.target).val()))
+    $(document).on("click", ".newColorPallette", t => {
+        newChangeColor($(t.target).val())
+    })
 })
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

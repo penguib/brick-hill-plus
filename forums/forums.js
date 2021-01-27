@@ -3,7 +3,8 @@ let replies = document.getElementsByClassName("p")
 
 const userApi = "https://api.brick-hill.com/v1/user/profile?id="
 const imgurRegex = /https:\/\/(i.)?imgur.com(\/a|\/gallery)?\/[0-9a-zA-Z]+(.png|.gif|.jpg|.jpeg)/
-const discordRegex = /https:\/\/cdn\.discordapp\.com\/attachments\/[0-9]+\/[0-9]+\/[a-zA-Z0-9]+(.png|.gif|.jpg|.jpeg)/
+const discordRegex = /https:\/\/cdn\.discordapp\.com\/attachments\/[0-9]+\/[0-9]+\/[a-zA-Z0-9\.\-\_\-]+(.png|.gif|.jpg|.jpeg)/
+const youtubeRegex = /http(s)?:\/\/www\.youtube\.com\/watch\?v=([^\\\. <>]+)/
 
 async function getRawImage(link) {
     let data = await fetch(link, {
@@ -33,17 +34,34 @@ for (let thread of threads) {
     })
 }
 
+// looking for images
 for (let reply of replies) {
     let match = reply.innerText.match(imgurRegex) || reply.innerText.match(discordRegex)
-    if (!match) continue
+    let youtubeMatch = reply.innerHTML.match(youtubeRegex)
+    console.log(youtubeMatch)
+    if (match) {
+        let img = document.createElement("img")
+        img.src = match[0]
+        reply.innerHTML = reply.innerHTML.replace(match[0], "")
+        
+        reply.appendChild(img)
+    }
 
-    // if (match[0].includes("/gallery/") || match[0].includes("/a/")) {
-    //     let data = getRawImage(match[0]).then(data => console.log(data))
-    // }
+    if (youtubeMatch) {
+        let youtubeVideo = document.createElement("iframe")
+        youtubeVideo.src = `https://www.youtube.com/embed/${youtubeMatch[5]}`
+        youtubeVideo.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        youtubeVideo.allowfullscreen = ""
+        youtubeVideo.width = "560"
+        youtubeVideo.height = "316"
+        youtubeVideo.style = "border:none"
 
-    let img = document.createElement("img")
-    img.src = match[0]
-    reply.innerText = reply.innerText.replace(match[0], "")
-    
-    reply.appendChild(img)
+        reply.appendChild(youtubeVideo)
+    }
+
 }
+
+
+// <iframe width="556" height="312" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+

@@ -1,14 +1,14 @@
 {
     "name": "Brick Hill+",
-    "version": "1.0.1",
-    "description": "placeholder v2",
+    "version": "1.0.5",
+    "description": "Adds features around the Brick Hill website to make navigating, talking, customizing avatars, and more much easier.",
     "manifest_version": 2,
     "content_scripts": [
         {
             "matches": [
                 "https://www.brick-hill.com/*"
             ],
-            "js": [ "jquery.js", "tradeNotifier.js", "navbar.js" ]
+            "js": [ "navbar.js" ]
         },
         {
             "matches": [
@@ -18,6 +18,7 @@
         },
         {
             "matches": [
+                "https://www.brick-hill.com/forum",
                 "https://www.brick-hill.com/forum/"
             ],
             "js": ["forums/forumsHome.js"]
@@ -30,13 +31,15 @@
         },
         {
             "matches": [
-                "https://www.brick-hill.com/forum/*"
+                "https://www.brick-hill.com/forum/*",
+                "https://www.brick-hill.com/forum"
             ],
             "js": ["forums/allForums.js"]
         },
         {
             "matches": [
-                "https://www.brick-hill.com/settings/"
+                "https://www.brick-hill.com/settings/",
+                "https://www.brick-hill.com/settings"
             ],
             "js": ["settings.js"]
         },
@@ -44,13 +47,13 @@
             "matches": [
                 "https://www.brick-hill.com/shop/*"
             ],
-            "js": ["itemPage.js"]
+            "js": ["itemPage.js", "jquery.js"]
         },
         {
             "matches": [
-                "https://www.brick-hill.com/customize/"
+                "https://www.brick-hill.com/message/*"
             ],
-            "js": [ "jquery.js", "avatar.js" ]
+            "js": ["messages.js"]
         }
     ],
     "icons": {
@@ -58,8 +61,5 @@
         "48":"./icons/PLUS48.png",
         "128":"./icons/PLUS.png"
     },
-    "background": {
-        "scripts": ["jquery.js","background.js"]
-    },
-    "permissions": ["notifications"]
+    "permissions": ["https://*.brick-hill.com/*/"]
 }

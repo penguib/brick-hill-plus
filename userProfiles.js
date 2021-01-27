@@ -4,13 +4,23 @@ let api = "https://api.brick-hill.com/v1/games/retrieveAvatar?id="
 let hatApi = "https://api.brick-hill.com/v1/shop/"
 
 function generateHTML(item, itemData) {
-    return ` <a href="/shop/${item}">
-                    <div class="profile-card award">
-                        <img src="${itemData.thumbnail}">
-                        <span class="ellipsis">${itemData.name}</span>
-                    </div>
-                </a>
-            `
+    let mainLink = document.createElement("a")
+    mainLink.href = `/shop/${item}`
+
+    let profileCard = document.createElement("div")
+    profileCard.className = "profile-card award"
+    mainLink.appendChild(profileCard)
+
+    let img = document.createElement("img")
+    img.src = `${itemData.thumbnail}`
+    profileCard.appendChild(img)
+
+    let span = document.createElement("span")
+    span.className = "ellipsis"
+    span.innerText = itemData.name
+    profileCard.appendChild(span)
+
+    return mainLink
 }
 
 async function getItemData(id) {
@@ -19,7 +29,18 @@ async function getItemData(id) {
 }
 
 async function appendItems(data) {
-    let s = `<div class="top blue">Wearing</div> <div class="content" style="text-align:center;">`
+
+    let mainDiv = document.createElement("div")
+    mainDiv.className = "top blue"
+    mainDiv.innerText = "Wearing"
+
+    let contentDiv = document.createElement("div")
+    contentDiv.className = "content"
+    contentDiv.style = "text-align:center;"
+
+
+
+    //let s = `<div class="top blue">Wearing</div> <div class="content" style="text-align:center;">`
     // counting to see if the user is wearing anything at all
     let zeroCount = 0
     
@@ -32,7 +53,8 @@ async function appendItems(data) {
         let req = await getItemData(hat)
         let hatData = req.data
 
-        s += generateHTML(hat, hatData)
+        contentDiv.appendChild( generateHTML(hat, hatData) )
+        
     }
 
     for (let item of Object.values(data)) {
@@ -45,14 +67,15 @@ async function appendItems(data) {
         let req = await getItemData(item)
         let itemData = req.data
 
-        s += generateHTML(item, itemData)
+        contentDiv.appendChild( generateHTML(item, itemData) )
     }
-    s += `</div>`
+
+    console.log("hee")
 
     if (zeroCount === 12)
         return null
 
-    return s
+    return [ mainDiv, contentDiv ]
 }
 
 if (userId) {
@@ -72,7 +95,12 @@ if (userId) {
         // wait for the html then append it to the DOM
         appendItems(data.items).then(html => {
             if (html) {
-                card.innerHTML = html
+                console.log("please be here")
+
+                card.appendChild(html[0])
+                card.appendChild(html[1])
+                //card.innerHTML = DOMPurify.sanitize(html)
+
                 mainDiv.appendChild(card)
             }
         })
