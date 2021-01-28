@@ -1,4 +1,5 @@
-const bucksConversion = 0.01
+const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
+const bucksConversion = bhpSettings.shopConversions || 0.01
 const itemType = document.getElementsByClassName("padding-bottom")[0].childNodes[1].childNodes[3].innerText
 const allowedItemTypes = [ "Hat", "Head", "Tool", "Face" ]
 
@@ -65,13 +66,21 @@ let checkForElement = setInterval(() => {
 	if (bucksDiv.length > 0) {
 		clearInterval(checkForElement)
 		let bucksAmount = bucksDiv[0].innerText.match(/([0-9]+)/)[0]
-		bucksDiv[0].innerText += ` ($${ numberWithCommas((bucksConversion * bucksAmount).toFixed(2)) })`
+
+		// 0 means that the user disabled conversions on the shop
+		if (bucksConversion != 0) {
+			bucksDiv[0].innerText += ` ($${ numberWithCommas((bucksConversion * bucksAmount).toFixed(2)) })`
+		}
 	}
 
 	if (bitsDiv.length > 0) {
 		clearInterval(checkForElement)
 		let bitsAmount = bitsDiv[0].innerText.match(/([0-9]+)/)[0]
-		bitsDiv[0].innerText += ` ($${ numberWithCommas((bucksConversion * (bitsAmount / 10)).toFixed(2)) })`
+
+		// 0 means that the user disabled conversions on the shop
+		if (bucksConversion != 0) {
+			bitsDiv[0].innerText += ` ($${ numberWithCommas((bucksConversion * (bitsAmount / 10)).toFixed(2)) })`
+		}
 	}
 
 }, 100)

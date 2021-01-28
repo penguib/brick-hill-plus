@@ -78,7 +78,8 @@ async function appendItems(data) {
     return [ mainDiv, contentDiv ]
 }
 
-if (userId) {
+// checking for friends because it was weirdly messing up the formatting of the page
+if (userId && !window.location.href.includes("friends")) {
 
     if (userId == 127118) {
         let username = document.getElementsByClassName("ellipsis")[3]

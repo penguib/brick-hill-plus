@@ -31,6 +31,15 @@
         },
         {
             "matches": [
+                "https://www.brick-hill.com/forum/*/create",
+                "https://www.brick-hill.com/forum/*/create/",
+                "https://www.brick-hill.com/forum/reply/*/",
+                "https://www.brick-hill.com/forum/reply/*"
+            ],
+            "js": ["forums/createPost.js"]
+        },
+        {
+            "matches": [
                 "https://www.brick-hill.com/forum/*",
                 "https://www.brick-hill.com/forum"
             ],
@@ -41,7 +50,7 @@
                 "https://www.brick-hill.com/settings/",
                 "https://www.brick-hill.com/settings"
             ],
-            "js": ["settings.js"]
+            "js": [ "jquery.js", "settings.js" ]
         },
         {
             "matches": [
@@ -54,6 +63,13 @@
                 "https://www.brick-hill.com/message/*"
             ],
             "js": ["messages.js"]
+        },
+        {
+            "matches": [
+                "https://www.brick-hill.com/friends/",
+                "https://www.brick-hill.com/friends"
+            ],
+            "js": ["friends.js"]
         }
     ],
     "icons": {
