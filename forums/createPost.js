@@ -7,9 +7,4 @@ forumBody.innerHTML = `
 
 
 
-
-
-
-
-${bhpSettings.forumSignature}
-`
+${bhpSettings.forumSignature.substring(0, 100)}`

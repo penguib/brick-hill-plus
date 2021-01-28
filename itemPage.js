@@ -1,7 +1,14 @@
 const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
 const bucksConversion = bhpSettings.shopConversions || 0.01
-const itemType = document.getElementsByClassName("padding-bottom")[0].childNodes[1].childNodes[3].innerText
 const allowedItemTypes = [ "Hat", "Head", "Tool", "Face" ]
+
+// only set itemType if we are on an item page, not just /shop/
+const itemType = (!window.location.href.match(/[0-9]+/)) ? null : document.getElementsByClassName("padding-bottom")[0].childNodes[1].childNodes[3].innerText
+
+
+
+let moreSellersButton = null
+let sellingItemsCount = 0
 
 function numberWithCommas(x) {
     if (x == undefined)
@@ -20,6 +27,7 @@ function resellerPriceConversion(sellingElement) {
 		if (price.innerText.match(/\$/)) continue
 		let amount = price.innerText.match(/[0-9]+/)
 		price.innerText += ` ($${ numberWithCommas((bucksConversion * amount).toFixed(2)) })`
+		++sellingItemsCount
 	}
 }
 
@@ -60,6 +68,11 @@ function createDownloadElements(itemType) {
 }
 
 let checkForElement = setInterval(() => {
+	// 0 means that the user disabled conversions on the shop
+	if (bucksConversion == 0) {
+		return clearInterval(checkForElement)
+	}
+
 	let bucksDiv = document.getElementsByClassName("purchase bucks flat no-cap")
 	let bitsDiv = document.getElementsByClassName("purchase bits flat no-cap")
 
@@ -67,41 +80,47 @@ let checkForElement = setInterval(() => {
 		clearInterval(checkForElement)
 		let bucksAmount = bucksDiv[0].innerText.match(/([0-9]+)/)[0]
 
-		// 0 means that the user disabled conversions on the shop
-		if (bucksConversion != 0) {
-			bucksDiv[0].innerText += ` ($${ numberWithCommas((bucksConversion * bucksAmount).toFixed(2)) })`
-		}
+		bucksDiv[0].innerText += ` ($${ numberWithCommas((bucksConversion * bucksAmount).toFixed(2)) })`
 	}
 
 	if (bitsDiv.length > 0) {
 		clearInterval(checkForElement)
 		let bitsAmount = bitsDiv[0].innerText.match(/([0-9]+)/)[0]
-
-		// 0 means that the user disabled conversions on the shop
-		if (bucksConversion != 0) {
-			bitsDiv[0].innerText += ` ($${ numberWithCommas((bucksConversion * (bitsAmount / 10)).toFixed(2)) })`
-		}
+		let calculation = bucksConversion * (bitsAmount / 10)
+		let calculationText = (calculation < 0.01) ? " (< $0.01)" : ` ($${numberWithCommas(calculation.toFixed(2))})`
+		bitsDiv[0].innerText += calculationText
 	}
 
 }, 100)
 
 
-if (document.getElementsByClassName("box relative shaded item-img  special ")) {
+if (document.getElementsByClassName("box relative shaded item-img  special ") && bucksConversion != 0) {
 	const loadMoreResellers = document.getElementsByClassName("forum-create-button green")
 	const sellingElement = document.getElementsByClassName("button bucks small flat")
 
-	let resellersInterval = setInterval(() => {
+	let waitForResellers = setInterval(() => {
 		if (sellingElement.length) {
-			clearInterval(resellersInterval)
+			clearInterval(waitForResellers)
 			resellerPriceConversion(sellingElement)
 		}
 	}, 100)
 
-	let loadMoreResellersInterval = setInterval(() => {
+
+	// we need to wait for the button to load more sellers
+	let waitForMoreResellers = setInterval(() => {
 		if (loadMoreResellers.length) {
-			clearInterval(loadMoreResellersInterval)
-			$(loadMoreResellers[0]).click(e => {
-				console.log("eee")
+			clearInterval(waitForMoreResellers)
+			$(loadMoreResellers[0]).click(() => {
+
+				// we need to wait for the new sellers to be appended to the DOM before we calculate the price
+				let waitForResellers = setInterval(() => {
+					let elements = document.getElementsByClassName("button bucks small flat")
+					if (elements.length > sellingItemsCount) {
+						clearInterval(waitForResellers)
+						resellerPriceConversion(elements)
+					}
+				}, 100)
+
 			})
 		}
 	}, 100)
