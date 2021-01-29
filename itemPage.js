@@ -5,9 +5,6 @@ const allowedItemTypes = [ "Hat", "Head", "Tool", "Face" ]
 // only set itemType if we are on an item page, not just /shop/
 const itemType = (!window.location.href.match(/[0-9]+/)) ? null : document.getElementsByClassName("padding-bottom")[0].childNodes[1].childNodes[3].innerText
 
-let moreSellersButton = null
-let sellingItemsCount = 0
-
 function createDivContainer() {
 	let div = document.createElement("div")
 	div.className = "col-12-12 mobile-col-1-2"
@@ -15,12 +12,26 @@ function createDivContainer() {
 }
 
 function resellerPriceConversion(sellingElement) {
-	for (price of sellingElement) {
-		if (price.innerText.match(/\$/)) continue
-		let amount = price.innerText.match(/[0-9]+/)
-		price.innerText += ` ($${ numberWithCommas((bucksConversion * amount).toFixed(2)) })`
-		++sellingItemsCount
+	if (sellingElement.innerText.match(/\$/)) return
+	let amount = sellingElement.innerText.match(/[0-9]+/)
+	sellingElement.innerText += ` ($${ String((bucksConversion * amount).toFixed(2)).replace(/\B(?=(\d{3})+(?!\d))/g, ",") })`
+}
+
+function addConversions(element, bits = false) {
+	if (!Number(bucksConversion)) return
+
+	let amount = element.innerText.match(/([0-9]+)/)
+
+	if (bits) {
+		if (!amount) return
+		let calculation = bucksConversion * (amount[0] / 10)
+		let calculationText = (calculation < 0.01) ? " (< $0.01)" : ` ($${calculation.toFixed(2).toLocaleString()})`
+		element.innerText += calculationText
+		return
 	}
+
+	if (!amount) return
+	element.innerText += ` ($${ (bucksConversion * amount[0]).toFixed(2).toLocaleString() })`
 }
 
 function createDownloadElements(itemType) {
@@ -59,101 +70,47 @@ function createDownloadElements(itemType) {
 	return mainDiv
 }
 
-const bucksDiv = document.querySelectorAll(".purchase.bucks")[0]
-const bitsDiv = document.querySelectorAll(".purchase.bits")
-const config = { attributes: true, childList: true, subtree: true }
-const observer = new MutationObserver(() => {});
+function lookForPurchaseButtons(callback) {
 
-const test = new MutationObserver(() => {})
+	const observer = new MutationObserver(callback)
 
-observer.observe(bucksDiv, config);
-observer.observe(bitsDiv, config);
-observer.disconnect();
+	observer.observe(document, {
+		childList: true,
+		subtree: true
+	})
 
-if (Number(bucksConversion) !== 0) {
-	let bucksAmount = bucksDiv.innerText.match(/([0-9]+)/)
-	if (bucksAmount) {
-		bucksDiv.innerText += ` ($${ (bucksConversion * bucksAmount[0]).toFixed(2).toLocaleString() })`
-	}
 }
 
-if (Number(bucksConversion) !== 0) {
-	let bitsAmount = bitsDiv.innerText.match(/([0-9]+)/)
-	if (bitsAmount) {
-		let calculation = bucksConversion * (bitsAmount[0] / 10)
-		let calculationText = (calculation < 0.01) ? " (< $0.01)" : ` ($${calculation.toFixed(2).toLocaleString()})`
-		bitsDiv.innerText += calculationText
+lookForPurchaseButtons((_, ob) => {
+	let bucksButton = document.querySelector("button.purchase.bucks.flat.no-cap")
+	let bitsButton = document.querySelector("button.purchase.bits.flat.no-cap")
+	if (document.contains(bucksButton)) {
+		addConversions(bucksButton)
+		ob.disconnect()
 	}
-}
-
-
-// const target = document.getElementsByClassName("purchase bucks flat no-cap")[0]
-
-// const bucksDiv = new MutationObserver(mutations => {
-// 	for (let mutation of mutations) {
-// 		console.log(mutation)
-// 	}
-// 	// console.log(target.innerText)
-
-// })
-
-// bucksDiv.observe(target, { subtree: true, childList: true, attributes: true })
-
-// let checkForElement = setInterval(() => {
-// 	// 0 means that the user disabled conversions on the shop
-// 	if (bucksConversion == 0) {
-// 		return clearInterval(checkForElement)
-// 	}
-
-// 	let bucksDiv = document.getElementsByClassName("purchase bucks flat no-cap")
-// 	let bitsDiv = document.getElementsByClassName("purchase bits flat no-cap")
-
-// 	if (bucksDiv.length > 0) {
-// 		clearInterval(checkForElement)
-		
-// 	}
-
-// 	if (bitsDiv.length > 0) {
-// 		clearInterval(checkForElement)
-// 		let bitsAmount = bitsDiv[0].innerText.match(/([0-9]+)/)[0]
-// 		let calculation = bucksConversion * (bitsAmount / 10)
-// 		let calculationText = (calculation < 0.01) ? " (< $0.01)" : ` ($${calculation.toFixed(2).toLocaleString()})`
-// 		bitsDiv[0].innerText += calculationText
-// 	}
-
-// }, 100)
+	if (document.contains(bitsButton)) {
+		addConversions(bitsButton, true)
+		ob.disconnect()
+	}
+})
 
 
 if (document.getElementsByClassName("box relative shaded item-img  special ") && bucksConversion != 0) {
 	const loadMoreResellers = document.getElementsByClassName("forum-create-button green")
 	const sellingElement = document.getElementsByClassName("button bucks small flat")
 
-	let waitForResellers = setInterval(() => {
-		if (sellingElement.length) {
-			clearInterval(waitForResellers)
-			resellerPriceConversion(sellingElement)
-		}
-	}, 100)
 
+	lookForPurchaseButtons((_, ob) => {
+		let elements = document.querySelectorAll("a.button.bucks.small.flat")
+		Array.from(elements).forEach(el => {
+			if (document.contains(el)) {
+				resellerPriceConversion(el)
 
-	// we need to wait for the button to load more sellers
-	let waitForMoreResellers = setInterval(() => {
-		if (loadMoreResellers.length) {
-			clearInterval(waitForMoreResellers)
-			$(loadMoreResellers[0]).click(() => {
-
-				// we need to wait for the new sellers to be appended to the DOM before we calculate the price
-				let waitForResellers = setInterval(() => {
-					let elements = document.getElementsByClassName("button bucks small flat")
-					if (elements.length > sellingItemsCount) {
-						clearInterval(waitForResellers)
-						resellerPriceConversion(elements)
-					}
-				}, 100)
-
-			})
-		}
-	}, 100)
+				// check if the "Load More" button is there
+				// ob.disconnect()
+			}
+		})
+	})
 }
 
 if (allowedItemTypes.includes(itemType)) {

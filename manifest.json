@@ -56,7 +56,7 @@
             "matches": [
                 "https://www.brick-hill.com/shop/*"
             ],
-            "js": ["itemPage.js", "jquery.js"]
+            "js": ["jquery.js", "itemPage.js"]
         },
         {
             "matches": [
