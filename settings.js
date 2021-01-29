@@ -46,7 +46,7 @@ bhplusSettingsCard.innerHTML = `
                     </div>
                     <br>
                     <span class="dark-gray-text" style="padding-bottom: 5px;">Forums Signature</span>
-                    <textarea id="bhp-forumSignature" class="width-100 block" maxlength="100" placeholder="100 characters max" style="height: 80px; margin-bottom: 6px;">${forumSignature}</textarea>
+                    <textarea id="bhp-forumSignature" class="width-100 block" maxlength="100" placeholder="100 characters max" style="height: 80px; margin-bottom: 6px;"></textarea>
                     <hr>
                     <span class="dark-gray-text bold block" style="padding-bottom: 5px;">Messages</span>
                     <div class="block">
@@ -81,6 +81,7 @@ bhplusSettingsCard.innerHTML = `
                 `
 bhplusSettingsColumn.appendChild(bhplusSettingsCard)
 
+$("#bhp-forumSignature").text(forumSignature)
 
 $("#bhp-save").click(() => {
     window.localStorage.setItem("bhp-settings", JSON.stringify({

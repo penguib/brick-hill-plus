@@ -5,16 +5,8 @@ const allowedItemTypes = [ "Hat", "Head", "Tool", "Face" ]
 // only set itemType if we are on an item page, not just /shop/
 const itemType = (!window.location.href.match(/[0-9]+/)) ? null : document.getElementsByClassName("padding-bottom")[0].childNodes[1].childNodes[3].innerText
 
-
-
 let moreSellersButton = null
 let sellingItemsCount = 0
-
-function numberWithCommas(x) {
-    if (x == undefined)
-        return "";
-    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-}
 
 function createDivContainer() {
 	let div = document.createElement("div")
@@ -67,31 +59,69 @@ function createDownloadElements(itemType) {
 	return mainDiv
 }
 
-let checkForElement = setInterval(() => {
-	// 0 means that the user disabled conversions on the shop
-	if (bucksConversion == 0) {
-		return clearInterval(checkForElement)
+const bucksDiv = document.querySelectorAll(".purchase.bucks")[0]
+const bitsDiv = document.querySelectorAll(".purchase.bits")
+const config = { attributes: true, childList: true, subtree: true }
+const observer = new MutationObserver(() => {});
+
+const test = new MutationObserver(() => {})
+
+observer.observe(bucksDiv, config);
+observer.observe(bitsDiv, config);
+observer.disconnect();
+
+if (Number(bucksConversion) !== 0) {
+	let bucksAmount = bucksDiv.innerText.match(/([0-9]+)/)
+	if (bucksAmount) {
+		bucksDiv.innerText += ` ($${ (bucksConversion * bucksAmount[0]).toFixed(2).toLocaleString() })`
 	}
+}
 
-	let bucksDiv = document.getElementsByClassName("purchase bucks flat no-cap")
-	let bitsDiv = document.getElementsByClassName("purchase bits flat no-cap")
-
-	if (bucksDiv.length > 0) {
-		clearInterval(checkForElement)
-		let bucksAmount = bucksDiv[0].innerText.match(/([0-9]+)/)[0]
-
-		bucksDiv[0].innerText += ` ($${ numberWithCommas((bucksConversion * bucksAmount).toFixed(2)) })`
+if (Number(bucksConversion) !== 0) {
+	let bitsAmount = bitsDiv.innerText.match(/([0-9]+)/)
+	if (bitsAmount) {
+		let calculation = bucksConversion * (bitsAmount[0] / 10)
+		let calculationText = (calculation < 0.01) ? " (< $0.01)" : ` ($${calculation.toFixed(2).toLocaleString()})`
+		bitsDiv.innerText += calculationText
 	}
+}
 
-	if (bitsDiv.length > 0) {
-		clearInterval(checkForElement)
-		let bitsAmount = bitsDiv[0].innerText.match(/([0-9]+)/)[0]
-		let calculation = bucksConversion * (bitsAmount / 10)
-		let calculationText = (calculation < 0.01) ? " (< $0.01)" : ` ($${numberWithCommas(calculation.toFixed(2))})`
-		bitsDiv[0].innerText += calculationText
-	}
 
-}, 100)
+// const target = document.getElementsByClassName("purchase bucks flat no-cap")[0]
+
+// const bucksDiv = new MutationObserver(mutations => {
+// 	for (let mutation of mutations) {
+// 		console.log(mutation)
+// 	}
+// 	// console.log(target.innerText)
+
+// })
+
+// bucksDiv.observe(target, { subtree: true, childList: true, attributes: true })
+
+// let checkForElement = setInterval(() => {
+// 	// 0 means that the user disabled conversions on the shop
+// 	if (bucksConversion == 0) {
+// 		return clearInterval(checkForElement)
+// 	}
+
+// 	let bucksDiv = document.getElementsByClassName("purchase bucks flat no-cap")
+// 	let bitsDiv = document.getElementsByClassName("purchase bits flat no-cap")
+
+// 	if (bucksDiv.length > 0) {
+// 		clearInterval(checkForElement)
+		
+// 	}
+
+// 	if (bitsDiv.length > 0) {
+// 		clearInterval(checkForElement)
+// 		let bitsAmount = bitsDiv[0].innerText.match(/([0-9]+)/)[0]
+// 		let calculation = bucksConversion * (bitsAmount / 10)
+// 		let calculationText = (calculation < 0.01) ? " (< $0.01)" : ` ($${calculation.toFixed(2).toLocaleString()})`
+// 		bitsDiv[0].innerText += calculationText
+// 	}
+
+// }, 100)
 
 
 if (document.getElementsByClassName("box relative shaded item-img  special ") && bucksConversion != 0) {
@@ -128,7 +158,6 @@ if (document.getElementsByClassName("box relative shaded item-img  special ") &&
 
 if (allowedItemTypes.includes(itemType)) {
 	let element = createDownloadElements(itemType)
-	console.log(element)
 	let container = document.getElementsByClassName("col-10-12 push-1-12 item-holder")[0]
 
 	container.appendChild(element)

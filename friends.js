@@ -1,5 +1,3 @@
-console.log("friends-page")
-
 const friendsCard = document.getElementsByClassName("card")[0]
 const friendsContent = document.getElementsByClassName("content text-center")[0]
 const friendsButtonContent = document.createElement("div")

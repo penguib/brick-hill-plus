@@ -4,7 +4,7 @@ if (!window.localStorage.getItem("bhp-settings")) {
         forumBadges: true,
         forumSignature: "",
         messagesImageEmbeds: true,
-        shopConversions: 0.099, // 100 bucks - $0.99
+        shopConversions: 0.0099, // 100 bucks - $0.99
         shopComments: true
 	}))
 }

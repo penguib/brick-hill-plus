@@ -38,9 +38,6 @@ async function appendItems(data) {
     contentDiv.className = "content"
     contentDiv.style = "text-align:center;"
 
-
-
-    //let s = `<div class="top blue">Wearing</div> <div class="content" style="text-align:center;">`
     // counting to see if the user is wearing anything at all
     let zeroCount = 0
     
@@ -70,8 +67,6 @@ async function appendItems(data) {
         contentDiv.appendChild( generateHTML(item, itemData) )
     }
 
-    console.log("hee")
-
     if (zeroCount === 12)
         return null
 
@@ -93,14 +88,11 @@ if (userId && !window.location.href.includes("friends")) {
         let card = document.createElement("div")
         card.className = "card"
 
-        // wait for the html then append it to the DOM
+        // wait for the html then append the clothing to the DOM
         appendItems(data.items).then(html => {
             if (html) {
-                console.log("please be here")
-
                 card.appendChild(html[0])
                 card.appendChild(html[1])
-                //card.innerHTML = DOMPurify.sanitize(html)
 
                 mainDiv.appendChild(card)
             }
