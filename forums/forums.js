@@ -67,9 +67,15 @@ if (bhpSettings.forumImageEmbeds) {
 
         for (let link of youtubeLinks) {
             let match = link.href.match(youtubeRegex)
+            console.log(match)
+
+            // for the case of links like https://www.youtube.com/watch?t=295&v=CS3deEpP4SM&feature=youtu.be
+            // my regex will match the code I need in match[6] and not match[5]
+            // but match[6] will return t=295&v=CS3deEpP4SM&feature=youtu.be, so i need to extract the code from that
+            let src = (match[5] === "watch") ? match[6].match(/\?t=[0-9]+\&v=([a-zA-Z0-9]+)&feature=youtu.be/)[1] : match[5]
 
             let youtubeVideo = document.createElement("iframe")
-            youtubeVideo.src = `https://www.youtube.com/embed/${match[5]}`
+            youtubeVideo.src = `https://www.youtube.com/embed/${ src }`
             youtubeVideo.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             youtubeVideo.allowfullscreen = ""
             youtubeVideo.width = "560"

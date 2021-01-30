@@ -46,7 +46,7 @@ bhplusSettingsCard.innerHTML = `
                     </div>
                     <br>
                     <span class="dark-gray-text" style="padding-bottom: 5px;">Forums Signature</span>
-                    <textarea id="bhp-forumSignature" class="width-100 block" maxlength="100" placeholder="100 characters max" style="height: 80px; margin-bottom: 6px;"></textarea>
+                    <input id="bhp-forumSignature" class="width-100 block" maxlength="100" placeholder="100 characters max" style="margin-bottom: 6px;" type="text"></input>
                     <hr>
                     <span class="dark-gray-text bold block" style="padding-bottom: 5px;">Messages</span>
                     <div class="block">
@@ -81,6 +81,8 @@ bhplusSettingsCard.innerHTML = `
                 `
 bhplusSettingsColumn.appendChild(bhplusSettingsCard)
 
+// appending the text after the element is in the DOM to prevent XSS
+// thanks to Dragonian
 $("#bhp-forumSignature").text(forumSignature)
 
 $("#bhp-save").click(() => {

@@ -94,22 +94,19 @@ lookForPurchaseButtons((_, ob) => {
 	}
 })
 
-
+// if the item is special and they have conversions on
 if (document.getElementsByClassName("box relative shaded item-img  special ") && bucksConversion != 0) {
-	const loadMoreResellers = document.getElementsByClassName("forum-create-button green")
-	const sellingElement = document.getElementsByClassName("button bucks small flat")
-
-
 	lookForPurchaseButtons((_, ob) => {
 		let elements = document.querySelectorAll("a.button.bucks.small.flat")
 		Array.from(elements).forEach(el => {
 			if (document.contains(el)) {
 				resellerPriceConversion(el)
-
-				// check if the "Load More" button is there
-				// ob.disconnect()
 			}
 		})
+
+		// stop observing if the "Load More" button is gone 
+		if (!document.querySelector("button.forum-create-button.green"))
+			ob.disconnect()
 	})
 }
 
@@ -119,4 +116,3 @@ if (allowedItemTypes.includes(itemType)) {
 
 	container.appendChild(element)
 }
-

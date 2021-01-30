@@ -69,13 +69,16 @@
                 "https://www.brick-hill.com/friends/",
                 "https://www.brick-hill.com/friends"
             ],
-            "js": ["friends.js"]
+            "js": ["jquery.js", "friends.js"]
         }
     ],
     "icons": {
         "16":"./icons/PLUS16.png",
         "48":"./icons/PLUS48.png",
         "128":"./icons/PLUS.png"
+    },
+    "background": {
+        "scripts": ["background.js"]
     },
     "permissions": ["https://*.brick-hill.com/*/"]
 }

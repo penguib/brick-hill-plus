@@ -3,6 +3,8 @@ let userId = url.match(/-?[0-9]+/)[0]
 let api = "https://api.brick-hill.com/v1/games/retrieveAvatar?id="
 let hatApi = "https://api.brick-hill.com/v1/shop/"
 
+// creating each element with creatElement to prevent XSS
+// thanks to Dragonian 
 function generateHTML(item, itemData) {
     let mainLink = document.createElement("a")
     mainLink.href = `/shop/${item}`

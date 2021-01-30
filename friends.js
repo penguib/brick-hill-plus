@@ -1,3 +1,4 @@
+const csrfToken = $("meta[name='csrf-token']").attr("content")
 const friendsCard = document.getElementsByClassName("card")[0]
 const friendsContent = document.getElementsByClassName("content text-center")[0]
 const friendsButtonContent = document.createElement("div")
@@ -26,3 +27,33 @@ DeclineAllButton.innerText = "Decline All"
 DeclineAllItem.appendChild(DeclineAllButton)
 
 friendsCard.insertBefore(friendsButtonContent, friendsContent)
+
+const successBanner = document.createElement("div")
+successBanner.className = "alert success"
+successBanner.style = "display:none"
+friendsCard.insertBefore(successBanner, friendsCard.childNodes[0])
+
+function handleResponse(message) {
+    console.log(message.response)
+}
+function handleError(error) {
+    console.log(`Error: ${error}`);
+}
+
+acceptAllButton.addEventListener("click", () => {
+    browser.runtime.sendMessage({
+        type: "accept",
+        csrfToken: csrfToken,
+        action: "friends"
+      }).then(handleResponse)
+})
+
+DeclineAllButton.addEventListener("click", () => {
+    let res = browser.runtime.sendMessage({
+        type: "decline",
+        csrfToken: csrfToken,
+        action: "friends"
+      })
+    res.then(handleResponse, handleError)
+
+})
