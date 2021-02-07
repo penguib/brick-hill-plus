@@ -1,12 +1,13 @@
 const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
 const bucksConversion = bhpSettings.shopConversions || 0.01
 const allowedItemTypes = [ "Hat", "Head", "Tool", "Face" ]
+const allowed3DItemTypes = [ "Hat", "Tool" ]
 
 // only set itemType if we are on an item page, not just /shop/
 const itemType = (!window.location.href.match(/[0-9]+/)) ? null : document.getElementsByClassName("padding-bottom")[0].childNodes[1].childNodes[3].innerText
 const itemId = (!window.location.href.match(/[0-9]+/)) ? null : window.location.href.match(/[0-9]+/)[0]
 
-if (allowedItemTypes.includes(itemType) && itemType !== "Face") {
+if (allowed3DItemTypes.includes(itemType)) {
 	const scene = new THREE.Scene()
 	const light = new THREE.HemisphereLight(0xFFFFFF, 0xB1B1B1, 1);
 	scene.add(light);
@@ -85,6 +86,7 @@ if (allowedItemTypes.includes(itemType) && itemType !== "Face") {
 		itemBox.style.padding = "0"
 		renderer.domElement.style.display = ""
 	
+		// Reset camera every time they want to see the item again
 		camera.position.set( -2.97, 5.085, 4.52 );
 
 		itemBoxChildren[2].style.display = "none"
@@ -138,15 +140,18 @@ function createDownloadElements(itemType) {
 	contentDiv.className = "content item-page"
 	mainDiv.appendChild(contentDiv)
 
-	let downloadTexture = document.createElement("a")
-	downloadTexture.className = "button green mobile-fill"
-	downloadTexture.style = "font-size: 15px;padding:10px"
-	downloadTexture.innerText = "Download Texture"
-	downloadTexture.href = `https://api.brick-hill.com/v1/games/retrieveAsset?id=${itemId}&type=png`
-
-	let textureDiv = createDivContainer()
-	textureDiv.appendChild(downloadTexture)
-	contentDiv.appendChild(textureDiv)
+	// if the item is anything BUT a head, add the download texture option
+	if (itemType !== "Head") {
+		let downloadTexture = document.createElement("a")
+		downloadTexture.className = "button green mobile-fill"
+		downloadTexture.style = "font-size: 15px;padding:10px"
+		downloadTexture.innerText = "Download Texture"
+		downloadTexture.href = `https://api.brick-hill.com/v1/games/retrieveAsset?id=${itemId}&type=png`
+	
+		let textureDiv = createDivContainer()
+		textureDiv.appendChild(downloadTexture)
+		contentDiv.appendChild(textureDiv)
+	}
 
 	// if the item is anything BUT a face, add the download model option
 	if (itemType !== "Face") {

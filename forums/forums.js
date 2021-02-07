@@ -4,6 +4,7 @@ const userApi = "https://api.brick-hill.com/v1/user/profile?id="
 const imgurRegex = /https:\/\/(i.)?imgur.com(\/a|\/gallery)?\/[0-9a-zA-Z]+(.png|.gif|.jpg|.jpeg)/gi
 const discordRegex = /https:\/\/(cdn|media)\.discordapp\.(com|net)\/(attachments|emojis)\/[0-9]+(\/[0-9]+\/)?[a-zA-Z0-9\.\-\_\-]+(.png|.gif|.jpg|.jpeg)(\?v=1)?/gi
 const youtubeRegex = /((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/
+const tenorRegex = /https:\/\/tenor.com\/view\/([a-zA-Z0-9\-]+)/gi
 const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
 const maxPxSize = 600
 
@@ -31,6 +32,9 @@ if (bhpSettings.forumBadges) {
 
 if (bhpSettings.forumImageEmbeds) {
     for (let reply of replies) {
+
+        let tenorMatches = reply.innerHTML.match(tenorRegex)
+        console.log(tenorMatches)
         let linkCopies = []
         let match = reply.innerHTML.match(imgurRegex) || reply.innerHTML.match(discordRegex)
         let adminImages = Array.from(reply.childNodes).filter(img => img.tagName === "IMG" && ( img.src.match(imgurRegex) || img.src.match(discordRegex) ))
@@ -64,11 +68,37 @@ if (bhpSettings.forumImageEmbeds) {
             }
         }
 
+        if (tenorMatches) {
+            for (let link in tenorMatches) {
+
+                // checks to see if the link has already been embedded
+                if (linkCopies.includes(tenorMatches[link])) continue
+                if (adminImages.find(img => img.src === tenorMatches[link])) continue
+                
+                // in case there are 2 of one link
+                // using replace here so that the regex converts the question mark to \? instead of leaving it as just ?
+                // leaving it as just ? messed up matching with discord emoji links
+                let imageRegExp = new RegExp(tenorMatches[link].replace("?", "\\?"), "g")
+                let copyMatch = reply.innerHTML.match(imageRegExp)
+                let src = (tenorMatches[link].includes(".gif")) ? tenorMatches[link].replace(".gif", "") : tenorMatches[link]
+                console.log(src)
+
+                if (copyMatch.length === 1) {
+                    reply.innerHTML = reply.innerHTML.replace(imageRegExp, `<img src='${src}' style='max-height:${maxPxSize}px;max-width:${maxPxSize}px;'>`)
+                    continue
+                }
+
+                // if there are more than one of the same link, then embed every occurance and add the link to the linkCopies array
+                reply.innerHTML = reply.innerHTML.replace(imageRegExp, `<img src='${src}' style='max-height:${maxPxSize}px;max-width:${maxPxSize}px;'>`)
+                linkCopies.push(tenorMatches[link])
+
+            }
+        }   
 
         // looking for the "a" tag in the reply since youtube links are embedded into links on the forums
         // Then I check if the "a" tag's href is also a youtube link
         let youtubeLinks = Array.from(reply.childNodes).filter(a => a.tagName === "A" && a.href.match(youtubeRegex))
-        if (!youtubeLinks.length) continue
+        //if (!youtubeLinks.length) continue
 
         for (let link of youtubeLinks) {
             let match = link.href.match(youtubeRegex)
@@ -90,5 +120,7 @@ if (bhpSettings.forumImageEmbeds) {
             reply.insertBefore(youtubeVideo, link.nextSibling)
             link.remove()
         }
+
+        
     }
 }
