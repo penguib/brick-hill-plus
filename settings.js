@@ -1,34 +1,35 @@
-let settingsMainDiv = document.getElementsByClassName("main-holder grid")[0]
+const bhpSettings = window.localStorage.getItem("bhp-settings")
+const parsedSettings = (bhpSettings) ? JSON.parse(bhpSettings) : {}
+const $ = e => { return document.getElementById(e) }
+const bhplusSettingsColumn = document.createElement("div")
+const settingsMainDiv = document.getElementsByClassName("main-holder grid")[0]
 
-let bhplusSettingsColumn = document.createElement("div")
 bhplusSettingsColumn.className = "col-10-12 push-1-12"
 settingsMainDiv.appendChild(bhplusSettingsColumn)
 
-let bhplusSettingsCard = document.createElement("div")
+const bhplusSettingsCard = document.createElement("div")
 bhplusSettingsCard.className = "card"
 
-let bhpSettings = window.localStorage.getItem("bhp-settings")
-let parsedSettings = (bhpSettings) ? JSON.parse(bhpSettings) : {}
 
+// this is so that we can check the checkboxes that they saved
 function booleanToChecked(value) {
     if (value)
         return "checked"
     return ""
 }
 
+// same as above, but instead of "checked" it's "selected"
 function conversionToSelected(value) {
     if (value === Number(parsedSettings.shopConversions))
         return "selected"
     return ""
 } 
 
-let forumImageEmbeds = (parsedSettings.forumImageEmbeds !== undefined) ? booleanToChecked(parsedSettings.forumImageEmbeds) : "checked"
-let forumBadges = (parsedSettings.forumBadges !== undefined) ? booleanToChecked(parsedSettings.forumBadges) : "checked"
-let forumSignature = (parsedSettings.forumSignature !== undefined) ? parsedSettings.forumSignature : ""
+const forumImageEmbeds = (parsedSettings.forumImageEmbeds !== undefined) ? booleanToChecked(parsedSettings.forumImageEmbeds) : "checked"
+const forumBadges = (parsedSettings.forumBadges !== undefined) ? booleanToChecked(parsedSettings.forumBadges) : "checked"
+const forumSignature = (parsedSettings.forumSignature !== undefined) ? parsedSettings.forumSignature : ""
 
-let messagesImageEmbeds = (parsedSettings.messagesImageEmbeds !== undefined) ? booleanToChecked(parsedSettings.messagesImageEmbeds) : "checked"
-
-let shopComments = (parsedSettings.shopComments !== undefined) ? booleanToChecked(parsedSettings.shopComments) : "checked"
+const messagesImageEmbeds = (parsedSettings.messagesImageEmbeds !== undefined) ? booleanToChecked(parsedSettings.messagesImageEmbeds) : "checked"
 
 
 bhplusSettingsCard.innerHTML = `
@@ -56,10 +57,6 @@ bhplusSettingsCard.innerHTML = `
                     <hr>
                     <span class="dark-gray-text bold block" style="padding-bottom: 5px;">Shop</span>
                     <div class="block">
-                        <span class="dark-gray-text" style="padding-bottom: 5px;">Comments</span>
-                        <input class="f-right" type="checkbox" id="bhp-shopComments" ${shopComments}>
-                    </div>
-                    <div class="block">
                         <span class="dark-gray-text" style="padding-bottom: 5px;">Buck/Bit Conversions</span>
                         <div class="inline f-right" style="width: 50%; max-width: 200px;">
                             <select id="bhp-shopConversions" class="no-right-rad width-100">
@@ -83,16 +80,17 @@ bhplusSettingsColumn.appendChild(bhplusSettingsCard)
 
 // appending the text after the element is in the DOM to prevent XSS
 // thanks to Dragonian
-$("#bhp-forumSignature").text(forumSignature)
+$("bhp-forumSignature").value = forumSignature
 
-$("#bhp-save").click(() => {
+document.getElementById("bhp-save").addEventListener("click", () => {
+
     window.localStorage.setItem("bhp-settings", JSON.stringify({
-        forumImageEmbeds: $("#bhp-forumImageEmbeds").is(":checked"),
-        forumBadges: $("#bhp-forumBadges").is(":checked"),
-        forumSignature: $("#bhp-forumSignature").val(),
-        messagesImageEmbeds: $("#bhp-messagesImageEmbeds").is(":checked"),
-        shopConversions: $("#bhp-shopConversions").val(),
-        shopComments: $("#bhp-shopComments").val()
+        forumImageEmbeds: $("bhp-forumImageEmbeds").checked,
+        forumBadges: $("bhp-forumBadges").checked,
+        forumSignature: $("bhp-forumSignature").value,
+        messagesImageEmbeds: $("bhp-messagesImageEmbeds").checked,
+        shopConversions: $("bhp-shopConversions").value
     }))
-    $("#bhp-success").show()
+
+    $("bhp-success").style = ""
 })

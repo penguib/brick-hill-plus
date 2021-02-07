@@ -1,10 +1,11 @@
 const threads = document.getElementsByClassName("thread-row")
 const replies = document.getElementsByClassName("p")
 const userApi = "https://api.brick-hill.com/v1/user/profile?id="
-const imgurRegex = /https:\/\/(i.)?imgur.com(\/a|\/gallery)?\/[0-9a-zA-Z]+(.png|.gif|.jpg|.jpeg)/g
-const discordRegex = /https:\/\/cdn\.discordapp\.com\/(attachments|emojis)\/[0-9]+(\/[0-9]+\/)?[a-zA-Z0-9\.\-\_\-]+(.png|.gif|.jpg|.jpeg)(\?v=1)?/g
+const imgurRegex = /https:\/\/(i.)?imgur.com(\/a|\/gallery)?\/[0-9a-zA-Z]+(.png|.gif|.jpg|.jpeg)/gi
+const discordRegex = /https:\/\/(cdn|media)\.discordapp\.(com|net)\/(attachments|emojis)\/[0-9]+(\/[0-9]+\/)?[a-zA-Z0-9\.\-\_\-]+(.png|.gif|.jpg|.jpeg)(\?v=1)?/gi
 const youtubeRegex = /((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/
 const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
+const maxPxSize = 600
 
 if (bhpSettings.forumBadges) {
     for (let thread of threads) {
@@ -32,28 +33,32 @@ if (bhpSettings.forumImageEmbeds) {
     for (let reply of replies) {
         let linkCopies = []
         let match = reply.innerHTML.match(imgurRegex) || reply.innerHTML.match(discordRegex)
+        let adminImages = Array.from(reply.childNodes).filter(img => img.tagName === "IMG" && ( img.src.match(imgurRegex) || img.src.match(discordRegex) ))
+
+        // I'm literally just hoping no admin causes this bug since I can't think of a way to fix it right now
+        // The bug is that if an admin embeds an image using the ![]() format and just posting their link to let BH+ embed it, only the one link formatted with ![]() will embed
+        // Other than that, they can do both with just different links
 
         if (match) {
             for (let link in match) {
 
                 // checks to see if the link has already been embedded
                 if (linkCopies.includes(match[link])) continue
-
+                if (adminImages.find(img => img.src === match[link])) continue
+                
                 // in case there are 2 of one link
                 // using replace here so that the regex converts the question mark to \? instead of leaving it as just ?
                 // leaving it as just ? messed up matching with discord emoji links
                 let imageRegExp = new RegExp(match[link].replace("?", "\\?"), "g")
                 let copyMatch = reply.innerHTML.match(imageRegExp)
 
-                console.log(copyMatch)
-
                 if (copyMatch.length === 1) {
-                    reply.innerHTML = reply.innerHTML.replace(imageRegExp, `<img src='${match[link]}'>`)
+                    reply.innerHTML = reply.innerHTML.replace(imageRegExp, `<img src='${match[link]}' style='max-height:${maxPxSize}px;max-width:${maxPxSize}px;'>`)
                     continue
                 }
 
                 // if there are more than one of the same link, then embed every occurance and add the link to the linkCopies array
-                reply.innerHTML = reply.innerHTML.replace(imageRegExp, `<img src='${match[link]}'>`)
+                reply.innerHTML = reply.innerHTML.replace(imageRegExp, `<img src='${match[link]}' style='max-height:${maxPxSize}px;max-width:${maxPxSize}px;'>`)
                 linkCopies.push(match[link])
 
             }
@@ -67,7 +72,6 @@ if (bhpSettings.forumImageEmbeds) {
 
         for (let link of youtubeLinks) {
             let match = link.href.match(youtubeRegex)
-            console.log(match)
 
             // for the case of links like https://www.youtube.com/watch?t=295&v=CS3deEpP4SM&feature=youtu.be
             // my regex will match the code I need in match[6] and not match[5]

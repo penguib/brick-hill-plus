@@ -30,29 +30,22 @@ async function friendsPOSTRequest(data) {
 
 browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
     if (request.action === "friends") {
-        // let allRequests = []
-        // let counter = 1
+        let allRequests = []
+        let counter = 1
     
-        // while (true) {
-        //     let req = await getAllFriendRequests(counter)
-        //     if (!req.length) break
-        //     allRequests = allRequests.concat(req)
-        //     ++counter
-        // }
+        while (true) {
+            let req = await getAllFriendRequests(counter)
+            if (!req.length) break
+            allRequests = allRequests.concat(req)
+            ++counter
+        }
     
-        // allRequests.forEach(async user => {
-        //     await friendsPOSTRequest({
-        //         "_token": request.csrfToken,
-        //         "userId": user,
-        //         "type": request.type
-        //     })
-        // })
-
-        // grammar matters
-        let verb = (request.type === "decline") ? "declined" : "accepted"
-
-        sendResponse({
-            response: `Successfully ${verb} all your friend requests`
+        allRequests.forEach(async user => {
+            await friendsPOSTRequest({
+                "_token": request.csrfToken,
+                "userId": user,
+                "type": request.type
+            })
         })
     }
 })

@@ -50,13 +50,13 @@
                 "https://www.brick-hill.com/settings/",
                 "https://www.brick-hill.com/settings"
             ],
-            "js": [ "jquery.js", "settings.js" ]
+            "js": ["settings.js"]
         },
         {
             "matches": [
                 "https://www.brick-hill.com/shop/*"
             ],
-            "js": ["jquery.js", "itemPage.js"]
+            "js": [ "./lib/three.js", "./lib/OBJLoader.js", "./lib/OrbitControls.js", "itemPage.js", "./lib/jquery.js"]
         },
         {
             "matches": [
@@ -69,7 +69,7 @@
                 "https://www.brick-hill.com/friends/",
                 "https://www.brick-hill.com/friends"
             ],
-            "js": ["jquery.js", "friends.js"]
+            "js": ["friends.js"]
         }
     ],
     "icons": {
@@ -77,8 +77,8 @@
         "48":"./icons/PLUS48.png",
         "128":"./icons/PLUS.png"
     },
-    "background": {
-        "scripts": ["background.js"]
-    },
-    "permissions": ["https://*.brick-hill.com/*/"]
+    "permissions": [
+        "https://*.brick-hill.com/*",
+        "https://brkcdn.com/*"
+    ]
 }

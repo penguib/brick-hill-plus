@@ -33,27 +33,22 @@ successBanner.className = "alert success"
 successBanner.style = "display:none"
 friendsCard.insertBefore(successBanner, friendsCard.childNodes[0])
 
-function handleResponse(message) {
-    console.log(message.response)
-}
-function handleError(error) {
-    console.log(`Error: ${error}`);
-}
-
 acceptAllButton.addEventListener("click", () => {
     browser.runtime.sendMessage({
         type: "accept",
         csrfToken: csrfToken,
         action: "friends"
-      }).then(handleResponse)
+      })
+    successBanner.style = ""
+    successBanner.innerText = "Currently accepting all your friend requests"
 })
 
 DeclineAllButton.addEventListener("click", () => {
-    let res = browser.runtime.sendMessage({
+    browser.runtime.sendMessage({
         type: "decline",
         csrfToken: csrfToken,
         action: "friends"
       })
-    res.then(handleResponse, handleError)
-
+    successBanner.style = ""
+    successBanner.innerText = "Currently declining all your friend requests"
 })

@@ -4,6 +4,102 @@ const allowedItemTypes = [ "Hat", "Head", "Tool", "Face" ]
 
 // only set itemType if we are on an item page, not just /shop/
 const itemType = (!window.location.href.match(/[0-9]+/)) ? null : document.getElementsByClassName("padding-bottom")[0].childNodes[1].childNodes[3].innerText
+const itemId = (!window.location.href.match(/[0-9]+/)) ? null : window.location.href.match(/[0-9]+/)[0]
+
+if (allowedItemTypes.includes(itemType) && itemType !== "Face") {
+	const scene = new THREE.Scene()
+	const light = new THREE.HemisphereLight(0xFFFFFF, 0xB1B1B1, 1);
+	scene.add(light);
+	
+	const camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
+	camera.position.set( -2.97, 5.085, 4.52 );
+	
+	const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+	renderer.domElement.style = "display:none;user-select:none"
+	renderer.setSize( 375, 375 );
+	
+	const itemBox = document.querySelector("div.box.relative.shaded.item-img")
+	const itemBoxChildren = itemBox.childNodes
+	itemBox.insertBefore(renderer.domElement, itemBoxChildren[0])
+
+	const texture = new THREE.TextureLoader();
+	const mapOverlay = texture.load(`https://api.brick-hill.com/v1/games/retrieveAsset?id=${itemId}&type=png`);
+	const material = new THREE.MeshPhongMaterial({map: mapOverlay});
+	
+	const box3D = new THREE.Box3()
+	const OBJloader = new THREE.OBJLoader();
+	
+	OBJloader.load(
+		`https://api.brick-hill.com/v1/games/retrieveAsset?id=${itemId}&type=obj`,
+		object => {
+			object.traverse(node => {
+				if (node.isMesh) node.material = material
+			})
+	
+			// Setting the center of the camera to be the center of the object
+			box3D.setFromObject(object);
+			box3D.center(controls.target);
+	
+			scene.add( object );
+		},
+		xhr => {},
+		err => {}
+	);
+	
+	// camera controls
+	var controls = new THREE.OrbitControls( camera, itemBox );
+	controls.autoRotate = true;
+	controls.enableZoom = true;
+	controls.minDistance = 1;
+	controls.maxDistance = 10;
+	controls.enablePan = false
+	controls.update()
+	
+	function render() {
+		renderer.render(scene, camera);
+	}
+	
+	function animate() {
+		controls.update()
+		requestAnimationFrame(animate);
+		render();
+	}
+	
+	animate();
+	
+	const view3D = document.createElement("button")
+	view3D.classList = "button medium green f-right"
+	view3D.style = "position:relative;right:-45px;"
+	view3D.innerText = "3D View"
+	itemBox.insertBefore(view3D, itemBoxChildren[itemBoxChildren.length - 1])
+	
+	const view2D = document.createElement("button")
+	view2D.classList = "button medium blue f-right"
+	view2D.style = "position: relative;top:-45px;right: 5px;display:none"
+	view2D.innerText = "2D View"
+	itemBox.insertBefore(view2D, itemBoxChildren[itemBoxChildren.length - 1])
+	
+	view3D.addEventListener("click", () => {
+		view3D.style.display = "none"
+		view2D.style.display = ""
+		itemBox.style.padding = "0"
+		renderer.domElement.style.display = ""
+	
+		camera.position.set( -2.97, 5.085, 4.52 );
+
+		itemBoxChildren[2].style.display = "none"
+	})
+	
+	view2D.addEventListener("click", () => {
+		view2D.style.display = "none"
+		view3D.style.display = ""
+		itemBox.style.padding = "50px"
+		renderer.domElement.style.display = "none"
+	
+		itemBoxChildren[2].style.display = ""
+	})
+	
+}
 
 function createDivContainer() {
 	let div = document.createElement("div")
@@ -35,8 +131,6 @@ function addConversions(element, bits = false) {
 }
 
 function createDownloadElements(itemType) {
-	const itemId = window.location.href.match(/[0-9]+/)[0]
-
 	let mainDiv = document.createElement("div")
 	mainDiv.className = "card mb2"
 
@@ -116,3 +210,4 @@ if (allowedItemTypes.includes(itemType)) {
 
 	container.appendChild(element)
 }
+

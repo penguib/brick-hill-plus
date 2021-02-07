@@ -7,7 +7,6 @@ const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
 let linkCopies = []
 
 let match = messageContent.innerHTML.match(imgurRegex) || messageContent.innerHTML.match(discordRegex)
-
 if (bhpSettings.messagesImageEmbeds) {
 	if (match) {
 		for (link in match) {

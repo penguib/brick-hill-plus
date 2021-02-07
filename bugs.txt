@@ -1,0 +1,2 @@
+- When admins try to embed the same image using ![]() and just leaving the link, only the link formatted with ![]() is embedded
+- Bucks/Bits icon gets removed when USD conversions happen
