@@ -1,2 +1,8 @@
-# jquery
-jquery.js
+# lib files
+lib/
+
+# zip files
+*.zip
+
+# txt files
+*.txt

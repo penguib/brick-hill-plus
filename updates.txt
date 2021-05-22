@@ -1,8 +1,0 @@
-1.0.6
-
-- Added max-height and max-width to images which are both 500px
-- Fixed forum signatures not showing in the settings page
-- Fixed links not embedding if the extension wasn't lowercase
-- Fixed Discord links not working with URLs such as: media.discordapp.com, media.discordapp.net, and cdn.discordapp.net
-- Added 3D viewer to items
-- Fixed not having signatures leading to a bunch of whitespace when creating forum posts 

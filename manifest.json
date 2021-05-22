@@ -1,6 +1,6 @@
 {
     "name": "Brick Hill+",
-    "version": "1.0.7",
+    "version": "1.0.6.1",
     "description": "Adds features around the Brick Hill website to make navigating, talking, customizing avatars, and more much easier.",
     "manifest_version": 2,
     "content_scripts": [
@@ -8,26 +8,26 @@
             "matches": [
                 "https://www.brick-hill.com/*"
             ],
-            "js": [ "navbar.js" ]
+            "js": [ "./src/navbar.js" ]
         },
         {
             "matches": [
                 "https://www.brick-hill.com/user/*"
             ],
-            "js": ["userProfiles.js"]
+            "js": [ "./lib/jquery.js", "./lib/three.js", "./lib/OBJLoader.js", "./lib/OrbitControls.js", "./lib/MTLLoader.js", "./src/userProfiles.js" ]
         },
         {
             "matches": [
                 "https://www.brick-hill.com/forum",
                 "https://www.brick-hill.com/forum/"
             ],
-            "js": ["forums/forumsHome.js"]
+            "js": [ "./src/forums/forumsHome.js" ]
         },
         {
             "matches": [
                 "https://www.brick-hill.com/forum/thread/*"
             ],
-            "js": [ "forums/forums.js"]
+            "js": [ "./src/forums/forums.js" ]
         },
         {
             "matches": [
@@ -36,40 +36,40 @@
                 "https://www.brick-hill.com/forum/reply/*/",
                 "https://www.brick-hill.com/forum/reply/*"
             ],
-            "js": ["forums/createPost.js"]
+            "js": [ "./src/forums/createPost.js" ]
         },
         {
             "matches": [
                 "https://www.brick-hill.com/forum/*",
                 "https://www.brick-hill.com/forum"
             ],
-            "js": ["forums/allForums.js"]
+            "js": [ "./src/forums/allForums.js" ]
         },
         {
             "matches": [
                 "https://www.brick-hill.com/settings/",
                 "https://www.brick-hill.com/settings"
             ],
-            "js": ["settings.js"]
+            "js": [ "./src/settings.js" ]
         },
         {
             "matches": [
                 "https://www.brick-hill.com/shop/*"
             ],
-            "js": [ "./lib/three.js", "./lib/OBJLoader.js", "./lib/OrbitControls.js", "itemPage.js", "./lib/jquery.js"]
+            "js": [ "./lib/three.js", "./lib/OBJLoader.js", "./lib/OrbitControls.js", "./src/itemPage.js", "./lib/jquery.js"]
         },
         {
             "matches": [
                 "https://www.brick-hill.com/message/*"
             ],
-            "js": ["messages.js"]
+            "js": [ "./src/messages.js" ]
         },
         {
             "matches": [
                 "https://www.brick-hill.com/friends/",
                 "https://www.brick-hill.com/friends"
             ],
-            "js": ["friends.js"]
+            "js": [ "./src/friends.js" ]
         }
     ],
     "icons": {
@@ -79,6 +79,11 @@
     },
     "permissions": [
         "https://*.brick-hill.com/*",
-        "https://brkcdn.com/*"
-    ]
+        "https://*.bhvalues.com/*",
+        "https://brkcdn.com/*",
+        "http://brkcdn.com/*"
+    ],
+    "background": {
+        "scripts": [ "./src/background.js" ]
+    }
 }

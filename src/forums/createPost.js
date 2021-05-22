@@ -1,25 +1,21 @@
-const threads = document.getElementsByClassName("thread-row")
-const replies = document.getElementsByClassName("p")
-const userApi = "https://api.brick-hill.com/v1/user/profile?id="
-const imgurRegex = /https:\/\/(i.)?imgur.com(\/a|\/gallery)?\/[0-9a-zA-Z]+(.png|.gif|.jpg|.jpeg)/gi
-const discordRegex = /https:\/\/(cdn|media)\.discordapp\.(com|net)\/(attachments|emojis)\/[0-9]+(\/[0-9]+\/)?[a-zA-Z0-9\.\-\_\-]+(.png|.gif|.jpg|.jpeg)(\?v=1)?/gi
-const youtubeRegex = /((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/
+const forumBody = document.getElementById("body")
 const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
+const lineBreaks = 6
+const imgurRegex = /https:\/\/(i.)?imgur.com(\/a|\/gallery)?\/[0-9a-zA-Z]+(.png|.gif|.jpg|.jpeg)/gi
+const discordRegex = /https:\/\/cdn\.discordapp\.com\/(attachments|emojis)\/[0-9]+(\/[0-9]+\/)?[a-zA-Z0-9\.\-\_\-]+(.png|.gif|.jpg|.jpeg)(\?v=1)?/gi
+const youtubeRegex = /((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/
 const maxPxSize = 600
-
-const codeRegex = /---js((.|[\n\r])+)[\n|\r]---/i
 
 const allowedEmbedDomains = [
     "media.discordapp",
     "cdn.discordapp",
     "youtube.com",
     "youtu.be",
-    "imgur.com",
+    "i.imgur.com",
     "tenor.com"
 ]
 const embedFormatRegExp = /\!\(((https?:\/\/[a-zA-Z0-9\.]+)(.+))\)/i
 const safeLinkRegExp = /\!\(<a target="_blank" href="(.+)\)">(.+)\)<\/a>/i
-
 
 function generateImageSrc(src) {
     if (src.includes("tenor.com") && !src.endsWith(".gif"))
@@ -34,47 +30,11 @@ function getYoutubeID(link) {
     return "https://www.youtube.com/embed/" + ((match[5] === "watch") ? match[6].match(/\?t=[0-9]+\&v=([a-zA-Z0-9]+)&feature=youtu.be/)[1] : match[5]).toUpperCase()
 }
 
-
-for (let reply of replies) {
-    let codeMatch = reply.innerHTML.match(codeRegex)
-    if (codeMatch) {
-        let script = document.createElement("script")
-        script.onload = () => {}
-        script.src = "https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"
-        script.type='text/javascript'
-        reply.appendChild(script)
-
-        let pre = document.createElement("pre")
-        pre.classList = "prettyprint lang-js s-code-block hljs javascript linenums prettyprinted"
-
-        let code = document.createElement("code")
-        code.innerHTML = codeMatch[1]
-        pre.appendChild(code)
-        reply.appendChild(pre)
-    }
+if (bhpSettings.forumSignature) {
+    forumBody.innerHTML = "\n".repeat(lineBreaks) + bhpSettings.forumSignature.substring(0, 100)
 }
 
-if (bhpSettings.forumBadges) {
-    for (let thread of threads) {
-        let innerHTML = thread.childNodes[1].innerHTML
-        let match = innerHTML.match(/\/user\/(-?[0-9]+)/)[1]
-        let mainDiv = thread.childNodes[1].childNodes[1]
-        fetch(userApi + match)
-        .then(res => res.json())
-        .then(data => {
-            let awards = data.awards
-            let isAdmin = awards.find(award => award.award_id === 3)
-
-            // add a break for non-admins so that the awards are under their post count
-            let s = (isAdmin) ? "" : "<br>"
-
-            for (let award of awards) {
-                s += `<img src="https://www.brick-hill.com/images/awards/${award.award_id}.png" style="width:40px">`
-            }
-            mainDiv.innerHTML += s
-        })
-    }
-}
+let replies = document.querySelectorAll("blockquote.red")
 
 if (bhpSettings.forumImageEmbeds) {
     for (let reply of replies) {
