@@ -1,6 +1,6 @@
 {
     "name": "Brick Hill+",
-    "version": "1.0.6",
+    "version": "1.0.6.1",
     "description": "Adds features around the Brick Hill website to make navigating, talking, customizing avatars, and more much easier.",
     "manifest_version": 2,
     "content_scripts": [
@@ -14,7 +14,7 @@
             "matches": [
                 "https://www.brick-hill.com/user/*"
             ],
-            "js": ["userProfiles.js"]
+            "js": ["./lib/jquery.js", "./lib/three.js", "./lib/OBJLoader.js", "./lib/OrbitControls.js", "./lib/MTLLoader.js", "userProfiles.js"]
         },
         {
             "matches": [
@@ -79,6 +79,10 @@
     },
     "permissions": [
         "https://*.brick-hill.com/*",
+        "https://*.bhvalues.com/*",
         "https://brkcdn.com/*"
-    ]
+    ],
+    "background": {
+        "scripts": ["background.js"]
+    }
 }

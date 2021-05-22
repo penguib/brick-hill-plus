@@ -1,8 +1,6 @@
 const threads = document.getElementsByClassName("thread-row")
 const replies = document.getElementsByClassName("p")
 const userApi = "https://api.brick-hill.com/v1/user/profile?id="
-const imgurRegex = /https:\/\/(i.)?imgur.com(\/a|\/gallery)?\/[0-9a-zA-Z]+(.png|.gif|.jpg|.jpeg)/gi
-const discordRegex = /https:\/\/(cdn|media)\.discordapp\.(com|net)\/(attachments|emojis)\/[0-9]+(\/[0-9]+\/)?[a-zA-Z0-9\.\-\_\-]+(.png|.gif|.jpg|.jpeg)(\?v=1)?/gi
 const youtubeRegex = /((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/
 const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
 const maxPxSize = 600
@@ -65,20 +63,19 @@ if (bhpSettings.forumImageEmbeds) {
 
         const domainRegExp = new RegExp(allowedEmbedDomains.join("|"))
 
-
         for (let link in match) {
 
             // [0] = !(https://youtube.com/watch?v=xxxxxxxxx)
             // [1] = https://youtube.com/watch?v=xxxxxxxxx
             // [2] = https://youtube.com
-            match[link] = match[link].toLowerCase()
             const formatMatch = match[link].match(embedFormatRegExp)
 
             if (!domainRegExp.test(formatMatch[2])) continue
             
             let textElement = Array.from( reply.childNodes ).find(el => {
                 if (!el.data) return
-                return el.data.toLowerCase().includes(formatMatch[0])
+                return el.data.includes(formatMatch[0])
+                //.toLowerCase().
             })
 
             let img = document.createElement("img")
@@ -94,7 +91,7 @@ if (bhpSettings.forumImageEmbeds) {
         for (let link in sfMatch) {
             // [0] = !(<a target=\"_blank\" href=\"https://www.youtube.com/watch?v=xxxxxx)\">https://www.youtube.com/watch?v=xxxxxx)</a>
             // [1] = https://youtube.com/watch?v=xxxxxxxxx
-            match[link] = match[link].toLowerCase()
+            
             const formatMatch = sfMatch[link].match(safeLinkRegExp)
 
             if (!domainRegExp.test(formatMatch[1])) continue
