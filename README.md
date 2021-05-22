@@ -13,8 +13,6 @@ Brick Hill+ can only affect the front-end of Brick Hill's website. Features such
 If you find a bug or have a suggestion for a feature, join the [Discord](https://discord.com/invite/wWsGUfZw4Z). The Discord will also include leaks of current features being worked on and other information relating to the extension.
 
 ## Features
-Some of the popular features
-
 ### 3D avatar viewers on user profiles
 
 
