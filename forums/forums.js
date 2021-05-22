@@ -7,6 +7,8 @@ const youtubeRegex = /((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be
 const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
 const maxPxSize = 600
 
+const codeRegex = /---js((.|[\n\r])+)[\n|\r]---/i
+
 const allowedEmbedDomains = [
     "media.discordapp",
     "cdn.discordapp",
@@ -29,9 +31,28 @@ function getYoutubeID(link) {
     let match = link.match(youtubeRegex)
     if (!match) return null
 
-    return "https://www.youtube.com/embed/" + ((match[5] === "watch") ? match[6].match(/\?t=[0-9]+\&v=([a-zA-Z0-9]+)&feature=youtu.be/)[1] : match[5])
+    return "https://www.youtube.com/embed/" + ((match[5] === "watch") ? match[6].match(/\?t=[0-9]+\&v=([a-zA-Z0-9]+)&feature=youtu.be/)[1] : match[5]).toUpperCase()
 }
 
+
+for (let reply of replies) {
+    let codeMatch = reply.innerHTML.match(codeRegex)
+    if (codeMatch) {
+        let script = document.createElement("script")
+        script.onload = () => {}
+        script.src = "https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"
+        script.type='text/javascript'
+        reply.appendChild(script)
+
+        let pre = document.createElement("pre")
+        pre.classList = "prettyprint lang-js s-code-block hljs javascript linenums prettyprinted"
+
+        let code = document.createElement("code")
+        code.innerHTML = codeMatch[1]
+        pre.appendChild(code)
+        reply.appendChild(pre)
+    }
+}
 
 if (bhpSettings.forumBadges) {
     for (let thread of threads) {
@@ -94,7 +115,7 @@ if (bhpSettings.forumImageEmbeds) {
         for (let link in sfMatch) {
             // [0] = !(<a target=\"_blank\" href=\"https://www.youtube.com/watch?v=xxxxxx)\">https://www.youtube.com/watch?v=xxxxxx)</a>
             // [1] = https://youtube.com/watch?v=xxxxxxxxx
-            match[link] = match[link].toLowerCase()
+            sfMatch[link] = sfMatch[link].toLowerCase()
             const formatMatch = sfMatch[link].match(safeLinkRegExp)
 
             if (!domainRegExp.test(formatMatch[1])) continue

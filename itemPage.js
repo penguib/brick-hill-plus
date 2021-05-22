@@ -3,6 +3,9 @@ const bucksConversion = bhpSettings.shopConversions || 0.01
 const allowedItemTypes = [ "Hat", "Head", "Tool", "Face" ]
 const allowed3DItemTypes = [ "Hat", "Tool" ]
 
+const cameraPosition = [ -2.97, 5.085, 4.52 ]
+const canvasSize = 375
+
 // only set itemType if we are on an item page, not just /shop/
 const itemType = (!window.location.href.match(/[0-9]+/)) ? null : document.getElementsByClassName("padding-bottom")[0].childNodes[1].childNodes[3].innerText
 const itemId = (!window.location.href.match(/[0-9]+/)) ? null : window.location.href.match(/[0-9]+/)[0]
@@ -13,11 +16,13 @@ if (allowed3DItemTypes.includes(itemType)) {
 	scene.add(light);
 	
 	const camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
-	camera.position.set( -2.97, 5.085, 4.52 );
+	//camera.position.set( cameraPosition[0], cameraPosition[1], cameraPosition[2] );
 	
 	const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
 	renderer.domElement.style = "display:none;user-select:none"
-	renderer.setSize( 375, 375 );
+	renderer.setSize(canvasSize, canvasSize);
+	renderer.domElement.style.width = "100%"
+	renderer.domElement.style.height = "100%"
 	
 	const itemBox = document.querySelector("div.box.relative.shaded.item-img")
 	const itemBoxChildren = itemBox.childNodes
@@ -32,17 +37,20 @@ if (allowed3DItemTypes.includes(itemType)) {
 	
 	OBJloader.load(
 		`https://api.brick-hill.com/v1/games/retrieveAsset?id=${itemId}&type=obj`,
+
 		object => {
 			object.traverse(node => {
-				if (node.isMesh) node.material = material
+				if (node.isMesh) 
+					node.material = material
 			})
 	
 			// Setting the center of the camera to be the center of the object
 			box3D.setFromObject(object);
 			box3D.center(controls.target);
 	
-			scene.add( object );
+			scene.add(object);
 		},
+
 		xhr => {},
 		err => {}
 	);
@@ -55,19 +63,15 @@ if (allowed3DItemTypes.includes(itemType)) {
 	controls.maxDistance = 10;
 	controls.enablePan = false
 	controls.update()
-	
-	function render() {
-		renderer.render(scene, camera);
-	}
-	
+
 	function animate() {
 		controls.update()
 		requestAnimationFrame(animate);
-		render();
+		renderer.render(scene, camera);
 	}
-	
-	animate();
-	
+
+	animate()
+
 	const view3D = document.createElement("button")
 	view3D.classList = "button medium green f-right"
 	view3D.style = "position:relative;right:-45px;"
@@ -76,18 +80,17 @@ if (allowed3DItemTypes.includes(itemType)) {
 	
 	const view2D = document.createElement("button")
 	view2D.classList = "button medium blue f-right"
-	view2D.style = "position: relative;top:-45px;right: 5px;display:none"
+	view2D.style = "position: relative;right: -45px;display:none"
 	view2D.innerText = "2D View"
 	itemBox.insertBefore(view2D, itemBoxChildren[itemBoxChildren.length - 1])
 	
 	view3D.addEventListener("click", () => {
 		view3D.style.display = "none"
 		view2D.style.display = ""
-		itemBox.style.padding = "0"
 		renderer.domElement.style.display = ""
 	
 		// Reset camera every time they want to see the item again
-		camera.position.set( -2.97, 5.085, 4.52 );
+		camera.position.set( cameraPosition[0], cameraPosition[1], cameraPosition[2] );
 
 		itemBoxChildren[2].style.display = "none"
 	})
@@ -95,7 +98,6 @@ if (allowed3DItemTypes.includes(itemType)) {
 	view2D.addEventListener("click", () => {
 		view2D.style.display = "none"
 		view3D.style.display = ""
-		itemBox.style.padding = "50px"
 		renderer.domElement.style.display = "none"
 	
 		itemBoxChildren[2].style.display = ""

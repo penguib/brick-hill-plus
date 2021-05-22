@@ -1,6 +1,6 @@
 {
     "name": "Brick Hill+",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "Adds features around the Brick Hill website to make navigating, talking, customizing avatars, and more much easier.",
     "manifest_version": 2,
     "content_scripts": [
@@ -27,7 +27,7 @@
             "matches": [
                 "https://www.brick-hill.com/forum/thread/*"
             ],
-            "js": ["forums/forums.js"]
+            "js": [ "forums/forums.js"]
         },
         {
             "matches": [
