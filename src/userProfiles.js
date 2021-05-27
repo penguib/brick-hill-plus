@@ -113,12 +113,12 @@ async function generateUserInfo() {
         const aCAdd = document.createElement("a")
         aCAdd.style = "color: cornflowerblue"
         aCAdd.innerText = "Click here "
-        aCAdd.href = "https://wwww.bhvalues.com/user/" + userId
+        aCAdd.href = "https://www.bhvalues.com/user/" + userId
         contentDiv.appendChild(aCAdd)
 
         const aAdd = document.createElement("a")
         aAdd.innerText = "to add them!"
-        aCAdd.href = "https://wwww.bhvalues.com/user/" + userId
+        aCAdd.href = "https://www.bhvalues.com/user/" + userId
         contentDiv.appendChild(aAdd)
 
     } else {
@@ -152,94 +152,18 @@ async function generateUserInfo() {
         }
     
         const aDetails = document.createElement("a")
-        aDetails.href = "https://wwww.bhvalues.com/user/" + userId
+        aDetails.href = "https://www.bhvalues.com/user/" + userId
         aDetails.innerText = "View more with "
         contentDiv.appendChild(aDetails)
     
         const aBHV = document.createElement("a")
-        aBHV.href = "https://wwww.bhvalues.com/user/" + userId
+        aBHV.href = "https://www.bhvalues.com/user/" + userId
         aBHV.style = "color: cornflowerblue"
         aBHV.innerText = "Brick Hill Values"
         contentDiv.appendChild(aBHV)
     }
 
     return mainDiv
-}
-
-async function getAssetURL(id) {
-    const polyApi = "https://api.brick-hill.com/v1/assets/getPoly/1/"
-    const assetApi = "https://api.brick-hill.com/v1/assets/get/"
-
-    const res = await fetch(polyApi + id)
-    const data = await res.json()
-    const d1 = data[0]
-
-    switch (d1.type) {
-        case "hat": {
-            const textureId = d1.texture.replace("asset://", "")
-            const meshId  = d1.mesh.replace("asset://", "")
-            const texture = await fetch(assetApi + textureId)
-            const mesh = await fetch(assetApi + meshId)
-
-            return [ texture, mesh, id ]
-        }
-        case "tool": {
-            const textureId = d1.texture.replace("asset://", "")
-            const meshId  = d1.mesh.replace("asset://", "")
-            const texture = await fetch(assetApi + textureId)
-            const mesh = await fetch(assetApi + meshId)
-
-            return [ texture, mesh ]
-        }
-        case "head": {
-            const meshId  = d1.mesh.replace("asset://", "")
-            const mesh = await fetch(assetApi + meshId)
-
-            return [ null, mesh, (id === 4859) ]
-        }
-        default: {
-            if (!d1.type)
-                return [ null, null ]
-            const textureId  = d1.texture.replace("asset://", "")
-            const texture = await fetch(assetApi + textureId)
-
-            return [ texture, null ]
-        }
-    }
-
-}
-
-async function getUserAssets(id) {
-    const res  = await fetch(api + id)
-    const data = await res.json()
-    const userData = {}
-
-    userData.colors = {}
-    for (c of Object.keys(data.colors))
-        userData.colors[c] = "#" + data.colors[c]
-
-    userData.hats = []
-    userData.head = []
-
-    for (hat of data.items.hats) {
-        if (!hat) continue
-        userData.hats.push( await getAssetURL(hat) )
-    }
-
-    if (data.items.head)
-        userData.head = await getAssetURL(data.items.head)
-    if (data.items.shirt)
-        userData.shirt = await getAssetURL(data.items.shirt)
-    if (data.items.pants)
-        userData.pants = await getAssetURL(data.items.pants)
-    if (data.items.tshirt)
-        userData.tshirt = await getAssetURL(data.items.tshirt)
-    if (data.items.face)
-        userData.face = await getAssetURL(data.items.face)
-    if (data.items.tool)
-        userData.tool = await getAssetURL(data.items.tool)
-
-    return userData
 }
 
 // Checking for friends because it was weirdly messing up the formatting of the page
@@ -275,54 +199,74 @@ if (userId && !window.location.href.includes("friends")) {
 }
 
 $(document).ready(async () => {
-    const userAssets = await getUserAssets(userId)
+    const dropDown = $("div[class='dropdown-content']")[0]
+    const ul = $(dropDown).find('ul')[0]
+    const li = document.createElement('li')
+    const a = document.createElement('a')
+    a.innerText = "Copy Avatar URL"
+    li.appendChild(a)
 
     const userContainer = document.querySelector("div.content.text-center.bold.medium-text.relative.ellipsis")
-    const box3D = new THREE.Box3()
-    const OBJLoader = new THREE.OBJLoader();
+    $(userContainer).css("outline", "none")
+    const imgs = $(userContainer).find('img')
+    const userThumbnail = imgs.toArray().find(i => i.src.includes("brkcdn"))
 
-    const scene = new THREE.Scene()
-    const light = new THREE.HemisphereLight(0xFFFFFF, 0xB1B1B1, 1);
-    scene.add(light);
+    $(li).click(() => {
+        navigator.clipboard.writeText(userThumbnail.src)
+        setTimeout(() => {
+            $(li).css("color", "")
+            $(a).text("Copy Avatar Img")
+        }, 2000)
+        $(li).css("color", "lightgreen")
+        $(a).text("Copied ✓")
+    })
 
-    const camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
-    camera.position.set( -2.97, 5.085, 4.52 );
+    if (!ul.children[0])
+        ul.appendChild(li)
+    else
+        ul.insertBefore(li, ul.children[0])
 
-    const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
-    renderer.setSize( 325, 327 );
-    $(renderer.domElement).css({
+    
+    /*  Renderer  */
+
+    const rendererData = await Render(userId, userContainer)
+    const canvas = rendererData.renderer
+    const camera = rendererData.camera
+
+    canvas.setSize( 325, 327 );
+    $(canvas.domElement).css({
         "margin-right": "auto",
         "margin-left": "auto"
     })
-    $(renderer.domElement).hide()
+    $(canvas.domElement).hide()
 
     const view3D = document.createElement("button")
-	view3D.classList = "button medium green"
+
+    view3D.classList = "button medium green f-right"
     $(view3D).css({
-        "position": "absolute",
-        "bottom": "125px",
-        "right": "10px"
+        "position": "relative",
     })
 	view3D.innerText = "3D"
 
     const userDescription = document.querySelector("div.user-description-box")
 
-    userContainer.insertBefore(renderer.domElement, userDescription)
+    userContainer.insertBefore(canvas.domElement, userDescription)
     userContainer.insertBefore(view3D, userDescription)
-    for (let i = 0; i < 3; ++i) {
-        userContainer.insertBefore(document.createElement("br"), userDescription)
-    }
+    
+    userContainer.insertBefore(document.createElement("br"), view3D)
 
-    // Finding the user thumbnail
-    let imgs = $(userContainer).find('img')
-    let userThumbnail = imgs.toArray().find(i => i.src.includes("brkcdn"))
+    for (let i = 0; i < 2; ++i)
+        userContainer.insertBefore(document.createElement("br"), userDescription)
 
     $(view3D).click(() => {
         const btt  = $(view3D)
         const text = btt.text()
+        const cameraPosition = new THREE.Vector3(-2.9850597402271473, 5.024487076222519, 4.542919202987628)
 
         if (text.includes("3D")) {
-            $(renderer.domElement).show()
+
+            camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+            $(canvas.domElement).show()
 
             btt.text("2D")
             btt.removeClass("green")
@@ -333,7 +277,7 @@ $(document).ready(async () => {
             return
         }
 
-        $(renderer.domElement).hide()
+        $(canvas.domElement).hide()
 
         btt.text("3D")
         btt.removeClass("blue")
@@ -344,356 +288,4 @@ $(document).ready(async () => {
         return
     })
 
-    const TextureLoader = new THREE.TextureLoader();
-    const MTLLoader = new THREE.MTLLoader()
-
-    const headColor  = new THREE.MeshPhongMaterial({ color: userAssets.colors.head      })
-    const torsoColor = new THREE.MeshPhongMaterial({ color: userAssets.colors.torso     })
-    const rArmColor  = new THREE.MeshPhongMaterial({ color: userAssets.colors.right_arm })
-    const lArmColor  = new THREE.MeshPhongMaterial({ color: userAssets.colors.left_arm  })
-    const rLegColor  = new THREE.MeshPhongMaterial({ color: userAssets.colors.right_leg })
-    const lLegColor  = new THREE.MeshPhongMaterial({ color: userAssets.colors.left_leg  })
-
-    
-    MTLLoader.load("https://cdn.bhvalues.com/etc/Character.mtl", mats => {
-        mats.preload()
-        OBJLoader.setMaterials(mats)
-        
-        OBJLoader.load(
-            "https://cdn.bhvalues.com/etc/Character.obj",
-
-            object => {
-                object.traverse(child => {
-                    if (child instanceof THREE.Mesh) {
-                        switch (child.name) {
-                            case "Head_Head_Head_Circle.000": {
-
-                                // If they are wearing headless
-                                if (userAssets.head[2]) {
-                                    child.visible = false
-                                    break
-                                }
-
-                                const faceMat = TextureLoader.load((userAssets.face) ? userAssets.face[0].url : "http://brkcdn.com/assets/default/face.png")
-
-                                child.material = new THREE.MeshPhongMaterial({
-                                    map: faceMat,
-                                    transparent: true,
-                                    opacity: (userAssets.head[1]) ? 0 : 1  // If user is wearing a head, hide the default one
-                                })
-                               
-                                
-                                if (userAssets.head[1]) {
-                                    OBJLoader.load(
-                                        userAssets.head[1].url,
-                                        object => {
-                                            object.traverse(child => {
-                                                child.material = new THREE.MeshPhongMaterial({
-                                                    map: faceMat,
-                                                    transparent: true,
-                                                    opacity: 1
-                                                })
-                                            })
-                                
-                                            scene.add( object );
-                                
-                                        }, xhr => {},  err => {}
-                                    )
-                                } else {
-                                    const bodyColor = child.clone()
-                                    bodyColor.material = headColor
-                                    scene.add(bodyColor)
-                                }
-
-                                break
-                            }
-                            case "Left_Arm_Left_Arm_Left_Arm_Cube_Left_Arm_Cube.000": {
-
-                                if (userAssets.shirt) {
-                                    const shirtMat = TextureLoader.load(userAssets.shirt[0].url)
-
-                                    child.material = new THREE.MeshPhongMaterial({
-                                        map: shirtMat,
-                                        transparent: true,
-                                        opacity: 1
-                                    })
-                                } else {
-
-                                    child.material = lArmColor
-
-                                    // If the user is wearing a shirt, studs won't be visible
-                                    // So only render studs when they aren't wearing one
-                                    const studs = child.clone()
-
-                                    studs.material = new THREE.MeshPhongMaterial({
-                                        map: TextureLoader.load("http://brkcdn.com/assets/default/studs.png"),
-                                        transparent: true,
-                                        opacity: 1
-                                    })
-
-                                    studs.renderOrder = 2
-                                    scene.add(studs)
-                                }
-
-                                const bodyColor = child.clone()
-                                bodyColor.material = lArmColor
-                                scene.add(bodyColor)
-
-                                break
-                            }
-                            case "Left_Leg_Left_Leg_Left_Leg_Left_Arm_Cube.005": {
-
-                                if (userAssets.pants) {
-                                    const pantsMat = TextureLoader.load(userAssets.pants[0].url)
-
-                                    child.material = new THREE.MeshPhongMaterial({
-                                        map: pantsMat,
-                                        transparent: true,
-                                        opacity: 1
-                                    })
-
-                                } else
-                                    child.material = lLegColor
-
-                                const bodyColor = child.clone()
-                                bodyColor.material = lLegColor
-                                scene.add(bodyColor)
-
-                                break
-                            }
-                            case "Right_Arm_Right_Arm_Right_Arm_Cube_Left_Arm_Cube.003": {
-
-                                if (userAssets.shirt) {
-                                    const shirtMat = TextureLoader.load(userAssets.shirt[0].url)
-
-                                    child.material = new THREE.MeshPhongMaterial({
-                                        map: shirtMat,
-                                        transparent: true,
-                                        opacity: 1
-                                    })
-                                    child.renderOrder = 3
-                                }
-                                else {
-                                    child.material = rArmColor
-
-                                    const studs = child.clone()
-
-                                    studs.material = new THREE.MeshPhongMaterial({
-                                        map: TextureLoader.load("http://brkcdn.com/assets/default/studs.png"),
-                                        transparent: true,
-                                        opacity: 1
-                                    })
-
-                                    studs.renderOrder = 1
-                                    scene.add(studs)
-
-                                    if (userAssets.tool) {
-                                        studs.rotation.x = -Math.PI / 2
-                                        studs.position.y = studs.position.z = 3.5
-                                    }
-                                }
-                                
-                                let bodyColor = child.clone()
-                                bodyColor.material = rArmColor
-                                bodyColor.renderOrder = 2
-                                scene.add(bodyColor)
-
-                                if (userAssets.tool) {
-                                    bodyColor.rotation.x = child.rotation.x = -Math.PI / 2;
-                                    bodyColor.position.y = bodyColor.position.z =  child.position.y = child.position.z = 3.5
-                                }
-
-                                break
-                            }
-                            case "Right_Leg_Right_Leg_Right_Leg_Left_Arm_Cube.006": {
-                                if (userAssets.pants) {
-                                    const pantsMat = TextureLoader.load(userAssets.pants[0].url)
-
-                                    child.material = new THREE.MeshPhongMaterial({
-                                        map: pantsMat,
-                                        transparent: true,
-                                        opacity: 1
-                                    })
-                                }
-                                    
-                                else
-                                    child.material = rLegColor
-
-                                const bodyColor = child.clone()
-                                bodyColor.material = rLegColor
-                                scene.add(bodyColor)
-
-                                break
-                            }
-                            case "Torso_Torso_Torso_Cube_Left_Arm_Cube.000": {
-
-                                if (userAssets.pants) {
-                                    if (userAssets.shirt) {
-                                        const shirtMat = TextureLoader.load(userAssets.shirt[0].url)
-
-                                        child.material = new THREE.MeshPhongMaterial({
-                                            map: shirtMat,
-                                            transparent: true,
-                                            opacity: 1
-                                        })
-
-                                        child.renderOrder = 3
-
-                                        const pantsMat = TextureLoader.load(userAssets.pants[0].url)
-                                        const pants = child.clone()
-
-                                        pants.material = new THREE.MeshPhongMaterial({
-                                            map: pantsMat,
-                                            transparent: true,
-                                            opacity: 1
-                                        })
-                                        pants.renderOrder = 2
-
-                                    } else {
-                                        const pantsMat = TextureLoader.load(userAssets.pants[0].url)
-                                        child.material = new THREE.MeshPhongMaterial({
-                                            map: pantsMat,
-                                            transparent: true,
-                                            opacity: 1
-                                        })
-                                    }
-
-                                } else if (userAssets.shirt) {
-                                    const shirtMat = TextureLoader.load(userAssets.shirt[0].url)
-
-                                    child.material = new THREE.MeshPhongMaterial({
-                                        map: shirtMat,
-                                        transparent: true,
-                                        opacity: 1
-                                    })
-
-                                } else 
-                                    child.material = torsoColor
-
-                                child.renderOrder = 1
-                                
-                                let bodyColor = child.clone()
-                                bodyColor.material = torsoColor
-                                scene.add(bodyColor)
-                                bodyColor.renderOrder = 1
-
-                                // Render the t-shirt here with the torso
-                                if (userAssets.tshirt) {
-                                    const geometry = new THREE.PlaneGeometry( 2, 1.9, 1 );
-                                    const tShirtMat = TextureLoader.load(userAssets.tshirt[0].url)
-                                    const material = new THREE.MeshBasicMaterial({
-                                        map: tShirtMat,
-                                        transparent: true
-                                    });
-                                    const plane = new THREE.Mesh( geometry, material );
-                                    plane.renderOrder = 2
-                                    scene.add( plane );
-
-                                    plane.position.y = 3 
-                                    plane.position.z = 0.5001
-                                }
-
-                                break
-                            }
-                            default: {
-
-                                child.material = new THREE.MeshPhongMaterial({
-                                    transparent: true,
-                                    opacity: 1
-                                })
-
-                                break
-                            }
-                        }
-                    }
-                    
-                })
-
-
-                box3D.setFromObject(object);
-                box3D.center(controls.target);
-                scene.add( object );
-
-            },
-            xhr => {},
-            err => {}
-        )
-    })
-
-
-    if (userAssets.head[1] && !userAssets.head[2]) {
-        OBJLoader.load(
-            userAssets.head[1].url,
-            object => {
-                object.traverse(child => {
-                    child.material = new THREE.MeshPhongMaterial({
-                        color: userAssets.colors.head
-                    })
-                })
-    
-                scene.add( object );
-    
-            },
-            xhr => {},
-            err => {}
-        )
-    }
-
-    if (userAssets.tool) {
-        OBJLoader.load(
-            userAssets.tool[1].url,
-            object => {
-                object.traverse(child => {
-                    child.material = new THREE.MeshPhongMaterial({
-                        map: TextureLoader.load(userAssets.tool[0].url)
-                    })
-                })
-    
-                scene.add( object );
-    
-            },
-            xhr => {},
-            err => {}
-        )
-    }
-
-    for (hat of userAssets.hats) {
-        const texture = hat[0].url
-        const obj = hat[1].url
-        OBJLoader.load(
-            obj,
-            object => {
-                object.traverse(child => {
-                    child.material = new THREE.MeshPhongMaterial({
-                        map: TextureLoader.load(texture)
-                    })
-                })
-    
-                scene.add( object );
-    
-            },
-            xhr => {},
-            err => {}
-        )
-    }
-
-    var controls = new THREE.OrbitControls( camera, userContainer );
-    //controls.autoRotate = true;
-    controls.enableZoom = true;
-    controls.minDistance = 1;
-    controls.maxDistance = 10;
-    controls.enablePan = false
-    controls.update()
-
-    function render() {
-        renderer.render(scene, camera);
-    }
-
-    function animate() {
-        controls.update()
-        requestAnimationFrame(animate);
-        render();
-    }
-
-    animate();
 })

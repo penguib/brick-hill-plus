@@ -2,106 +2,272 @@ const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
 const bucksConversion = bhpSettings.shopConversions || 0.01
 const allowedItemTypes = [ "Hat", "Head", "Tool", "Face" ]
 const allowed3DItemTypes = [ "Hat", "Tool" ]
+const userID = $("meta[name='user-data']")?.attr("data-id")
 
 // only set itemType if we are on an item page, not just /shop/
 const itemType = (!window.location.href.match(/[0-9]+/)) ? null : document.getElementsByClassName("padding-bottom")[0].childNodes[1].childNodes[3].innerText
-const itemId = (!window.location.href.match(/[0-9]+/)) ? null : window.location.href.match(/[0-9]+/)[0]
+const itemID = (!window.location.href.match(/[0-9]+/)) ? null : window.location.href.match(/[0-9]+/)[0];
 
-if (allowed3DItemTypes.includes(itemType)) {
-	const scene = new THREE.Scene()
-	const light = new THREE.HemisphereLight(0xFFFFFF, 0xB1B1B1, 1);
-	scene.add(light);
-	
-	const camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
-	camera.position.set( -2.97, 5.085, 4.52 );
-	
-	const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
-	renderer.domElement.style = "display:none;user-select:none"
-	renderer.setSize( 375, 375 );
-	
+(async () => {
+
 	const itemBox = document.querySelector("div.box.relative.shaded.item-img")
 	const itemBoxChildren = itemBox.childNodes
-	itemBox.insertBefore(renderer.domElement, itemBoxChildren[0])
 
-	const texture = new THREE.TextureLoader();
-	const mapOverlay = texture.load(`https://api.brick-hill.com/v1/games/retrieveAsset?id=${itemId}&type=png`);
-	const material = new THREE.MeshPhongMaterial({map: mapOverlay});
+	// Gets rids of annoying blue outline when clicked on
+	$(itemBox).css("outline", "none")
+
+	// Adding an ID to the img to make it easier to get later
+	$(itemBoxChildren[1]).attr("id", "item-img")
+
+	const itemContainer = $("div[class='content item-page']")[0]
+	$(itemContainer).css("overflow", "hidden")
+	let comp = window.getComputedStyle(itemContainer)
 	
-	const box3D = new THREE.Box3()
-	const OBJloader = new THREE.OBJLoader();
-	
-	OBJloader.load(
-		`https://api.brick-hill.com/v1/games/retrieveAsset?id=${itemId}&type=obj`,
-		object => {
-			object.traverse(node => {
-				if (node.isMesh) node.material = material
-			})
-	
-			// Setting the center of the camera to be the center of the object
-			box3D.setFromObject(object);
-			box3D.center(controls.target);
-	
-			scene.add( object );
-		},
-		xhr => {},
-		err => {}
-	);
-	
-	// camera controls
-	var controls = new THREE.OrbitControls( camera, itemBox );
-	controls.autoRotate = true;
-	controls.enableZoom = true;
-	controls.minDistance = 1;
-	controls.maxDistance = 10;
-	controls.enablePan = false
-	controls.update()
-	
-	function render() {
-		renderer.render(scene, camera);
-	}
-	
-	function animate() {
-		controls.update()
-		requestAnimationFrame(animate);
-		render();
-	}
-	
-	animate();
-	
+	//dropdown-content
+	const dropDown = $("div[class='dropdown-content']")[0]
+    const ul = $(dropDown).find('ul')[0]
+    const li = document.createElement('li')
+    const a = document.createElement('a')
+    a.innerText = "Copy Item URL"
+    li.appendChild(a)
+
+    const userContainer = document.querySelector("div.content.text-center.bold.medium-text.relative.ellipsis")
+    $(userContainer).css("outline", "none")
+    const itemImage = document.getElementById("item-img")
+
+    $(li).click(() => {
+        navigator.clipboard.writeText(itemImage.src)
+        setTimeout(() => {
+            $(li).css("color", "")
+            $(a).text("Copy Item Img")
+        }, 2000)
+        $(li).css("color", "lightgreen")
+        $(a).text("Copied ✓")
+    })
+
+    if (!ul.children[0])
+        ul.appendChild(li)
+    else
+        ul.insertBefore(li, ul.children[0])
+
 	const view3D = document.createElement("button")
 	view3D.classList = "button medium green f-right"
-	view3D.style = "position:relative;right:-45px;"
+	view3D.style = "position: relative; right: -45px;"
 	view3D.innerText = "3D"
-	itemBox.insertBefore(view3D, itemBoxChildren[itemBoxChildren.length - 1])
-	
-	const view2D = document.createElement("button")
-	view2D.classList = "button medium blue f-right"
-	view2D.style = "position: relative;top:-45px;right: 5px;display:none"
-	view2D.innerText = "2D"
-	itemBox.insertBefore(view2D, itemBoxChildren[itemBoxChildren.length - 1])
-	
-	view3D.addEventListener("click", () => {
-		view3D.style.display = "none"
-		view2D.style.display = ""
-		itemBox.style.padding = "0"
-		renderer.domElement.style.display = ""
-	
-		// Reset camera every time they want to see the item again
-		camera.position.set( -2.97, 5.085, 4.52 );
 
-		itemBoxChildren[2].style.display = "none"
-	})
+	const tryOnBtt = document.createElement("button")
+	tryOnBtt.classList = "button medium green f-left"
+	tryOnBtt.style = "position: relative; left: -45px;"
+	tryOnBtt.innerText = "Try On"
+
+	const toggleTryOn = color => {
+		const btt = $(tryOnBtt)
+		switch (color) {
+			case "red": {
+				btt.removeClass("green")
+				btt.addClass("red")
+				btt.text("Take Off")
+				break
+			}
+			case "green": {
+				btt.removeClass("red")
+				btt.addClass("green")
+				btt.text("Try On")
+				break
+			}
+		}
+	}
+
+	if (allowed3DItemTypes.includes(itemType)) {
+		const scene = new THREE.Scene()
+		const light = new THREE.HemisphereLight(0xFFFFFF, 0xB1B1B1, 1);
+		scene.add(light);
+		
+		const camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
+		camera.position.set( -2.97, 5.085, 4.52 );
+		
+		const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+		renderer.setSize( 375, 375 );
+		renderer.domElement.style = "display: none; user-select: none; width: 100%"
+		$(renderer.domElement).attr('id', 'item-viewer')
+
+		itemBox.insertBefore(renderer.domElement, itemBoxChildren[0])
+		itemBox.insertBefore(view3D, itemBoxChildren[itemBoxChildren.length - 1])
+
+		// Download buttons are broken
+		const itemData = await getAssetURL(itemID)
 	
-	view2D.addEventListener("click", () => {
-		view2D.style.display = "none"
-		view3D.style.display = ""
+		const texture = new THREE.TextureLoader();
+		const mapOverlay = texture.load(itemData.texture.url);
+		const material = new THREE.MeshPhongMaterial({map: mapOverlay});
+		
+		const box3D = new THREE.Box3()
+		const OBJloader = new THREE.OBJLoader();
+
+		const parseOBJ = (mesh, cb) => {
+			const FileLoader = new THREE.FileLoader()
+			FileLoader.load(mesh, data => {
+				const lines = data.split('\n')
+				const parsedFile = lines.filter(line => {
+					return line.indexOf("l") != 0
+				})
+				cb(parsedFile.join('\r\n'))
+			})
+		}
+
+		parseOBJ(itemData.mesh.url, parsed => {
+			let model = OBJloader.parse(parsed)
+			model.traverse(child => {
+				child.material = material
+			})
+
+			box3D.setFromObject(model);
+			box3D.center(controls.target);
+			scene.add(model)
+		})
+		
+		// camera controls
+		var controls = new THREE.OrbitControls( camera, itemBox );
+		controls.autoRotate = true;
+		controls.enableZoom = true;
+		controls.minDistance = 1;
+		controls.maxDistance = 10;
+		controls.enablePan = false
+		controls.update()
+		
+		
+		function animate() {
+			controls.update()
+			requestAnimationFrame(animate);
+			renderer.render(scene, camera);
+		}
+		
+		animate();
+		
+
+		view3D.addEventListener("click", () => {
+			const itemViewer   = $("#item-viewer")
+			const itemImg      = $("#item-img")
+			const avatarViewer = $("#avatar-viewer")
+			if (view3D.innerText.includes("3D")) {
+				
+				// Setting the height prevents an annoying resizing bug
+				$(itemContainer).css("height", comp.height)
+				view3D.innerText = "2D"
+				
+				itemViewer.show()
+				itemImg.hide()
+				avatarViewer.hide()
+				toggleTryOn("green")
+
+				const pos = quad => { return {
+					"top": "-50px",
+					[[quad]]: "5px"
+				}}
+
+				$(view3D).css( pos("right") )
+				$(tryOnBtt).css( pos("left") )
+
+				// Reset camera every time they want to see the item again
+				camera.position.set( -2.97, 5.085, 4.52 );
+		
+				itemBox.style.padding = "0"
+				return
+			}
+
+			view3D.innerText = "3D"
+			renderer.domElement.style.display = "none"
+
+			const pos = quad => { return {
+				"top": "",
+				[[quad]]: "-45px"
+			}}
+
+			itemViewer.hide()
+			avatarViewer.hide()
+			itemImg.show()
+			toggleTryOn("green")
+
+			$(itemContainer).css("height", "")
+			$(view3D).css( pos("right") )
+			$(tryOnBtt).css( pos("left") )
+		
+			// Reset camera every time they want to see the item again
+			camera.position.set( -2.97, 5.085, 4.52 );
+	
+			itemBox.style.padding = "50px"
+		})
+	}
+
+	// If the userID is undefined, then the user isn't logged in
+	// Users not logged in can't try on items
+	if (!userID)
+		return
+
+	itemBox.insertBefore(tryOnBtt, itemBoxChildren[itemBoxChildren.length - 1])
+
+	const rendererData = await Render(userID, itemBox, itemID)
+	const avatarRenderer = rendererData.renderer
+	const avatarCamera = rendererData.camera
+	avatarRenderer.setSize( 375, 375 );
+	avatarRenderer.domElement.style = "display: none; user-select: none; width: 100%"
+	$(avatarRenderer.domElement).attr('id', 'avatar-viewer')
+	itemBox.insertBefore(avatarRenderer.domElement, itemBoxChildren[0])
+
+
+	$(tryOnBtt).click(() => {
+		const itemViewer   = $("#item-viewer")
+		const itemImg      = $("#item-img")
+		const avatarViewer = $("#avatar-viewer")
+		const cameraPosition = new THREE.Vector3(-3.667381161503485, 5.669098837327955, 5.5813344027963065)
+
+		if (tryOnBtt.innerText.toLowerCase().includes("try on")) {
+
+			// Can't pass in the vector unfortunately
+			avatarCamera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+
+			$(itemContainer).css("height", comp.height)
+			avatarViewer.show()
+			toggleTryOn("red")
+
+			const pos = quad => { return {
+				"top": "-50px",
+				[[quad]]: "5px"
+			}}
+
+			itemImg.hide()
+			if (itemViewer.length) {
+				itemViewer.hide()
+				$(view3D).css( pos("right") )
+			}
+			$(tryOnBtt).css( pos("left") )
+
+			itemBox.style.padding = "0"
+
+			return
+		}
+
+		$(itemContainer).css("height", comp.height)
+			toggleTryOn("green")
+
+			const pos = quad => { return {
+				"top": "",
+				[[quad]]: "-45px"
+			}}
+
+			itemImg.show()
+			if (itemViewer.length) {
+				itemViewer.hide()
+				$(view3D).css( pos("right") )
+			}
+			avatarViewer.hide()
+			$(tryOnBtt).css( pos("left") )
+
+			itemBox.style.padding = "0"
+		
 		itemBox.style.padding = "50px"
-		renderer.domElement.style.display = "none"
-	
-		itemBoxChildren[2].style.display = ""
 	})
-	
-}
+})()
 
 function createDivContainer() {
 	let div = document.createElement("div")
@@ -147,7 +313,7 @@ function createDownloadElements(itemType) {
 		downloadTexture.className = "button green mobile-fill"
 		downloadTexture.style = "font-size: 15px;padding:10px"
 		downloadTexture.innerText = "Download Texture"
-		downloadTexture.href = `https://api.brick-hill.com/v1/games/retrieveAsset?id=${itemId}&type=png`
+		downloadTexture.href = `https://api.brick-hill.com/v1/games/retrieveAsset?id=${itemID}&type=png`
 	
 		let textureDiv = createDivContainer()
 		textureDiv.appendChild(downloadTexture)
@@ -160,7 +326,7 @@ function createDownloadElements(itemType) {
 		downloadModel.className = "button blue mobile-fill"
 		downloadModel.style = "font-size: 15px;padding:10px"
 		downloadModel.innerText = "Download Model"
-		downloadModel.href = `https://api.brick-hill.com/v1/games/retrieveAsset?id=${itemId}&type=obj`
+		downloadModel.href = `https://api.brick-hill.com/v1/games/retrieveAsset?id=${itemID}&type=obj`
 
 		let modelDiv = createDivContainer()
 		modelDiv.appendChild(downloadModel)
@@ -181,81 +347,6 @@ function lookForPurchaseButtons(callback) {
 
 }
 
-function getBHPData(callback) {
-	fetch(`https://api.bhvalues.com/v1/item/${itemId}`)
-	.then(res => res.json())
-	.then(data => {
-		callback(data)
-	})
-	.catch()
-}
-
-// small-text mt6 mb2
-function getBHPlusData() {
-
-	const linkDiv = document.createElement("div")
-	linkDiv.className = "item-stats"
-	
-	const linkA = document.createElement("a")
-	linkA.innerText = "View Owners and More Details"
-	linkA.href = `https://www.bhvalues.com/item/${itemId}`
-
-	const mainDiv = document.createElement("div")
-	mainDiv.className = "item-stats"
-
-	mainDiv.appendChild(document.createElement("br"))
-
-	const valueButton = document.createElement("button")
-	valueButton.className = "button green flat no-cap small"
-
-	const demandButton = document.createElement("button")
-	demandButton.className = "button orange flat no-cap small"
-	demandButton.style = "margin-left: 5px"
-
-	const shorthandButton = document.createElement("button")
-	shorthandButton.className = "button blue flat no-cap small"
-	shorthandButton.style = "margin-left: 5px"
-
-	const infoText = document.createElement("a")
-	infoText.innerText = "Item stats and info powered by "
-	infoText.style = "font-size:12px"
-	infoText.href = "https://www.bhvalues.com/"
-
-	const bhvLink = document.createElement("a")
-	bhvLink.style = "color:cornflowerblue;font-size:12px"
-	bhvLink.innerText = "Brick Hill Values"
-	bhvLink.href = "https://www.bhvalues.com/"
-
-	getBHPData(data => {
-		if (data.err) {
-			linkA.innerText += " on "
-
-			const okLink = document.createElement("a")
-			okLink.style = "color:cornflowerblue"
-			okLink.innerText = "Brick Hill Values"
-			okLink.href = "https://www.bhvalues.com/items/" + itemId
-			linkA.appendChild(okLink)
-			linkDiv.appendChild(linkA)
-			return
-		}
-
-		valueButton.innerText = `Value: ${data.value.toLocaleString()}`
-		demandButton.innerText = `Demand: ${data.demand}`
-		shorthandButton.innerText = `Shorthand: ${data.shorthand}`
-
-		linkDiv.appendChild(linkA)
-
-		mainDiv.appendChild(valueButton)
-		mainDiv.appendChild(demandButton)
-		mainDiv.appendChild(shorthandButton)
-
-		mainDiv.appendChild(document.createElement("br"))
-		mainDiv.appendChild(infoText)
-		mainDiv.appendChild(bhvLink)
-	})
-
-	return [ mainDiv, linkDiv ]
-}
 
 lookForPurchaseButtons((_, ob) => {
 	let bucksButton = document.querySelector("button.purchase.bucks.flat.no-cap")

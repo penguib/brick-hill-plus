@@ -1,7 +1,7 @@
 ![](https://cdn.discordapp.com/attachments/803658597476859984/814693847652892682/PLUS.png)
 
 ## About
-Brick Hill+ is a browser extension that gives users access features that Brick Hill hasn't implemented yet. 
+Brick Hill+ is a browser extension that gives users access to features that Brick Hill hasn't implemented yet. 
 
 ## Downloads
 Currently, the extension only supports [FireFox](https://addons.mozilla.org/en-US/firefox/addon/brick-hill/) and [Chrome](https://chrome.google.com/webstore/detail/brick-hill%20/hendnmfbkcgmpafikljbfhpgphdilohj?hl=en).

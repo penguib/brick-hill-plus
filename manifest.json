@@ -3,18 +3,29 @@
     "version": "1.0.6.1",
     "description": "Adds features around the Brick Hill website to make navigating, talking, customizing avatars, and more much easier.",
     "manifest_version": 2,
+
     "content_scripts": [
         {
             "matches": [
                 "https://www.brick-hill.com/*"
             ],
-            "js": [ "./src/navbar.js" ]
+            "js": [ "./src/navbar.js" ],
+            "run_at": "document_idle"
         },
         {
             "matches": [
                 "https://www.brick-hill.com/user/*"
             ],
-            "js": [ "./lib/jquery.js", "./lib/three.js", "./lib/OBJLoader.js", "./lib/OrbitControls.js", "./lib/MTLLoader.js", "./src/userProfiles.js" ]
+            "js": [ 
+                "./src/getAssets.js",
+                "./src/renderAvatar.js", 
+                "./lib/jquery.js", 
+                "./lib/three.js", 
+                "./lib/OBJLoader.js", 
+                "./lib/OrbitControls.js", 
+                "./lib/MTLLoader.js", 
+                "./src/userProfiles.js" 
+            ]
         },
         {
             "matches": [
@@ -56,7 +67,17 @@
             "matches": [
                 "https://www.brick-hill.com/shop/*"
             ],
-            "js": [ "./lib/three.js", "./lib/OBJLoader.js", "./lib/OrbitControls.js", "./src/itemPage.js", "./lib/jquery.js"]
+            "js": [ 
+                "./src/utils/brickHillPlus.js",
+                "./lib/jquery.js",
+                "./src/renderAvatar.js",
+                "./src/getAssets.js",
+                "./lib/three.js", 
+                "./lib/MTLLoader.js", 
+                "./lib/OBJLoader.js", 
+                "./lib/OrbitControls.js", 
+                "./src/itemPage.js"
+            ]
         },
         {
             "matches": [
@@ -80,8 +101,7 @@
     "permissions": [
         "https://*.brick-hill.com/*",
         "https://*.bhvalues.com/*",
-        "https://brkcdn.com/*",
-        "http://brkcdn.com/*"
+        "*://brkcdn.com/*"
     ],
     "background": {
         "scripts": [ "./src/background.js" ]
