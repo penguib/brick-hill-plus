@@ -5,8 +5,8 @@
 ## About
 Brick Hill+ is a browser extension that gives users access to features that Brick Hill hasn't implemented yet. Download the extension to your corresponding browser
 
-[![Chrome](https://github.com/ovity/octotree/blob/master/assets/chrome.png "Chrome")](https://chrome.google.com/webstore/detail/brick-hill%20/hendnmfbkcgmpafikljbfhpgphdilohj?hl=en)
-[![Firefox](https://github.com/ovity/octotree/blob/master/assets/firefox.png "Firefox")](https://addons.mozilla.org/en-US/firefox/addon/brick-hill/)
+[![Chrome](https://github.com/alrra/browser-logos/blob/main/src/chrome/chrome_64x64.png "Chrome")](https://chrome.google.com/webstore/detail/brick-hill%20/hendnmfbkcgmpafikljbfhpgphdilohj?hl=en)
+[![Firefox](https://github.com/alrra/browser-logos/blob/main/src/firefox/firefox_64x64.png "FireFox")](https://addons.mozilla.org/en-US/firefox/addon/brick-hill/)
 
 ## Limitations
 Brick Hill+ can only affect the front-end of Brick Hill's website. Features such as search by past usernames, sort the shop by specials, etc. are examples of back-end features where Brick Hill+ reaches its limitations.
