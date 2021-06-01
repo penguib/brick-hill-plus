@@ -27,6 +27,7 @@ function conversionToSelected(value) {
 
 const forumImageEmbeds = (parsedSettings.forumImageEmbeds !== undefined) ? booleanToChecked(parsedSettings.forumImageEmbeds) : "checked"
 const forumBadges = (parsedSettings.forumBadges !== undefined) ? booleanToChecked(parsedSettings.forumBadges) : "checked"
+const forumPPD = (parsedSettings.forumPPD !== undefined) ? booleanToChecked(parsedSettings.forumPPD) : "checked"
 const forumSignature = (parsedSettings.forumSignature !== undefined) ? parsedSettings.forumSignature : ""
 
 const messagesImageEmbeds = (parsedSettings.messagesImageEmbeds !== undefined) ? booleanToChecked(parsedSettings.messagesImageEmbeds) : "checked"
@@ -44,6 +45,10 @@ bhplusSettingsCard.innerHTML = `
                     <div class="block">
                         <span class="dark-gray-text" style="padding-bottom: 5px;">Badges</span>
                         <input class="f-right" type="checkbox" id="bhp-forumBadges" ${forumBadges}>
+                    </div>
+                    <div class="block">
+                        <span class="dark-gray-text" style="padding-bottom: 5px;">Posts Per Day</span>
+                        <input class="f-right" type="checkbox" id="bhp-forumPPD" ${forumPPD}>
                     </div>
                     <br>
                     <span class="dark-gray-text" style="padding-bottom: 5px;">Forums Signature</span>
@@ -71,7 +76,13 @@ bhplusSettingsCard.innerHTML = `
                         </div>
                     </div>
                     <br>
+                    <hr>
+                    <span class="dark-gray-text bold block" style="padding-bottom: 5px;">Navbar</span>
+                    <span class="dark-gray-text" style="padding-bottom: 5px;">Custom Button</span>
+                    <input id="bhp-CBName" class="block" maxlength="20" placeholder="Button name" style="margin-bottom: 6px;" type="text"></input>
+                    <input id="bhp-CBLink" class="block" placeholder="Button link" style="margin-bottom: 6px;" type="text"></input>
                     <button id="bhp-save" class="button small blue">Save</button>
+                    <br>
                 </div>
                 
                 

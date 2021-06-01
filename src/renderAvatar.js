@@ -66,10 +66,12 @@ async function Render(userId, container, tryOnAsset = null) {
                                 // If they are wearing headless
                                 if (userAssets.head.headless || (tryOn?.type === "head" && tryOn?.headless)) {
                                     child.visible = false
+                                    box3D.setFromObject(child);
+                                    box3D.center(controls.target);
                                     break
                                 }
                                 const faceData = userAssets.face
-                                const faceMat = (tryOn?.type === "face") ? tryOn.texture.url : ((faceData) ? faceData.texture.url : "http://brkcdn.com/assets/default/face.png")
+                                const faceMat = (tryOn?.type === "face") ? tryOn.texture : ((faceData) ? faceData.texture : "http://brkcdn.com/assets/default/face.png")
                                 const existsHead = (Object.keys(userAssets.head).length > 0) || tryOn?.type === "head"
 
                                 child.material = new THREE.MeshPhongMaterial({
@@ -80,9 +82,10 @@ async function Render(userId, container, tryOnAsset = null) {
 
                                 if (existsHead) {
                                     const model = ((Object.keys(userAssets.head).length > 0) ? userAssets.head : tryOn)
-                                    quickLoad(model.mesh.url, new THREE.MeshPhongMaterial({
+                                    quickLoad(model.mesh, new THREE.MeshPhongMaterial({
                                         map: TextureLoader.load(faceMat),
                                         transparent: true,
+                                        side: THREE.DoubleSide,
                                         opacity: 1
                                     }))
                                     break
@@ -92,16 +95,16 @@ async function Render(userId, container, tryOnAsset = null) {
                                 bodyColor.material = headColor
                                 scene.add(bodyColor)
 
-                                break
+                                box3D.setFromObject(child);
+                                box3D.center(controls.target);
 
-                                // box3D.setFromObject(child);
-                                // box3D.center(controls.target);
+                                break
                             }
                             case "Left_Arm_Left_Arm_Left_Arm_Cube_Left_Arm_Cube.000": {
                                 
                                 const shirtData = userAssets.shirt
                                 if (shirtData || tryOn?.type === "shirt") {
-                                    const shirtMat = TextureLoader.load( (tryOn?.type === "shirt") ? tryOn.texture.url : shirtData.texture.url )
+                                    const shirtMat = TextureLoader.load( (tryOn?.type === "shirt") ? tryOn.texture : shirtData.texture )
 
                                     child.material = new THREE.MeshPhongMaterial({
                                         map: shirtMat,
@@ -136,7 +139,7 @@ async function Render(userId, container, tryOnAsset = null) {
 
                                 const pantsData = userAssets.pants
                                 if (pantsData || tryOn?.type === "pants") {
-                                    const pantsMat = TextureLoader.load( (tryOn?.type === "pants") ? tryOn.texture.url : pantsData.texture.url )
+                                    const pantsMat = TextureLoader.load( (tryOn?.type === "pants") ? tryOn.texture : pantsData.texture )
 
                                     child.material = new THREE.MeshPhongMaterial({
                                         map: pantsMat,
@@ -157,7 +160,7 @@ async function Render(userId, container, tryOnAsset = null) {
 
                                 const shirtData = userAssets.shirt
                                 if (shirtData || tryOn?.type === "shirt") {
-                                    const shirtMat = TextureLoader.load( (tryOn?.type === "shirt") ? tryOn.texture.url : shirtData.texture.url )
+                                    const shirtMat = TextureLoader.load( (tryOn?.type === "shirt") ? tryOn.texture : shirtData.texture )
 
                                     child.material = new THREE.MeshPhongMaterial({
                                         map: shirtMat,
@@ -202,7 +205,7 @@ async function Render(userId, container, tryOnAsset = null) {
 
                                 const pantsData = userAssets.pants
                                 if (pantsData || tryOn?.type === "pants") {
-                                    const pantsMat = TextureLoader.load( (tryOn?.type === "pants") ? tryOn.texture.url : pantsData.texture.url )
+                                    const pantsMat = TextureLoader.load( (tryOn?.type === "pants") ? tryOn.texture : pantsData.texture )
 
                                     child.material = new THREE.MeshPhongMaterial({
                                         map: pantsMat,
@@ -226,11 +229,11 @@ async function Render(userId, container, tryOnAsset = null) {
                                 const shirtData = userAssets.shirt
                                 if (pantsData || tryOn?.type === "pants") {
 
-                                    const pantsMat = TextureLoader.load( (tryOn?.type === "pants") ? tryOn.texture.url : pantsData.texture.url )
+                                    const pantsMat = TextureLoader.load( (tryOn?.type === "pants") ? tryOn.texture : pantsData.texture )
 
                                     if (shirtData || tryOn?.type === "shirt") {
 
-                                        const shirtMat = TextureLoader.load( (tryOn?.type === "shirt") ? tryOn.texture.url : shirtData.texture.url  )
+                                        const shirtMat = TextureLoader.load( (tryOn?.type === "shirt") ? tryOn.texture : shirtData.texture  )
                                         const pants = child.clone()
 
                                         pants.material = new THREE.MeshPhongMaterial({
@@ -254,7 +257,7 @@ async function Render(userId, container, tryOnAsset = null) {
                                     }
 
                                 } else if (shirtData || tryOn?.type === "shirt") {
-                                    const shirtMat = TextureLoader.load( (tryOn?.type === "shirt") ? tryOn.texture.url : shirtData.texture.url )
+                                    const shirtMat = TextureLoader.load( (tryOn?.type === "shirt") ? tryOn.texture : shirtData.texture )
 
                                     child.material = new THREE.MeshPhongMaterial({
                                         map: shirtMat,
@@ -270,11 +273,10 @@ async function Render(userId, container, tryOnAsset = null) {
                                 const tshirtData = userAssets.tshirt
                                 if (tshirtData || tryOn?.type === "tshirt") {
                                     const geometry = new THREE.PlaneGeometry( 2, 1.9, 1 );
-                                    const tShirtMat = TextureLoader.load( (tryOn?.type === "tshirt") ? tryOn.texture.url : tshirtData.texture.url  )
+                                    const tShirtMat = TextureLoader.load( (tryOn?.type === "tshirt") ? tryOn.texture : tshirtData.texture  )
                                     const material = new THREE.MeshBasicMaterial({
                                         map: tShirtMat,
-                                        transparent: true,
-                                        color: userAssets.colors.torso
+                                        transparent: true
                                     });
                                     const plane = new THREE.Mesh( geometry, material );
                                     plane.renderOrder = 2
@@ -306,8 +308,8 @@ async function Render(userId, container, tryOnAsset = null) {
                 })
 
 
-                box3D.setFromObject(object);
-                box3D.center(controls.target);
+                // box3D.setFromObject(object);
+                // box3D.center(controls.target);
                 scene.add( object );
 
             },
@@ -316,41 +318,6 @@ async function Render(userId, container, tryOnAsset = null) {
         )
     })
 
-    /*
-        Heads
-
-        - impostor
-        - headless breaks camera 
-        - pyramid face
-        - reserveds face
-        - mutated doesnt put face on normal face
-        - hocl face
-
-        Hats
-        - credit card
-
-    */
-
-    if (Object.keys(userAssets.head).length || tryOn?.type === "head") {
-        if (userAssets.head?.headless || tryOn?.headless)
-            return
-
-        const model = ((Object.keys(userAssets.head).length > 0) ? userAssets.head : tryOn)
-        quickLoad(model.mesh.url, new THREE.MeshPhongMaterial({
-            color: userAssets.colors.head,
-            side: THREE.DoubleSide
-        }))
-    }
-       
-
-    if (userAssets.tool || tryOn?.type === "tool") {
-        const mesh = (tryOn?.type === "tool") ? tryOn.mesh.url : userAssets.tool.mesh.url
-        const texture = (tryOn?.type === "tool") ? tryOn.texture.url : userAssets.tool.texture.url
-        quickLoad(mesh, new THREE.MeshPhongMaterial({
-            map: TextureLoader.load(texture)
-        }))
-    }
-    
     const parseOBJ = (mesh, cb) => {
         const FileLoader = new THREE.FileLoader()
         FileLoader.load(mesh, data => {
@@ -362,15 +329,36 @@ async function Render(userId, container, tryOnAsset = null) {
         })
     }
 
+    if (Object.keys(userAssets.head).length || tryOn?.type === "head") {
+        if (userAssets.head?.headless || tryOn?.headless)
+            return
+
+        const model = ((Object.keys(userAssets.head).length > 0) ? userAssets.head : tryOn)
+        quickLoad(model.mesh, new THREE.MeshPhongMaterial({
+            color: userAssets.colors.head,
+            side: THREE.DoubleSide
+        }))
+    }
+       
+
+    if (userAssets.tool || tryOn?.type === "tool") {
+        const mesh = (tryOn?.type === "tool") ? tryOn.mesh : userAssets.tool.mesh
+        const texture = (tryOn?.type === "tool") ? tryOn.texture : userAssets.tool.texture
+        quickLoad(mesh, new THREE.MeshPhongMaterial({
+            map: TextureLoader.load(texture),
+            side: THREE.DoubleSide
+        }))
+    }
+
     // remove L lines to fix wireframe issue 
     if (userAssets.hats.length || tryOn?.type === "hat") {
 
         if (tryOn?.type === "hat") {
-            parseOBJ(tryOn.mesh.url, parsed => {
+            parseOBJ(tryOn.mesh, parsed => {
                 let model = OBJLoader.parse(parsed)
                 model.traverse(child => {
                     child.material = new THREE.MeshPhongMaterial({
-                        map: TextureLoader.load(tryOn.texture.url)
+                        map: TextureLoader.load(tryOn.texture)
                     })
                 })
                 scene.add(model)
@@ -380,11 +368,12 @@ async function Render(userId, container, tryOnAsset = null) {
 
         if (userAssets.hats.length === 5) {
             for (let i = 0, len = userAssets.hats.length - 1; i < len; ++i) {
-                parseOBJ(hat.mesh.url, parsed => {
+                parseOBJ(hat.mesh, parsed => {
                     let model = OBJLoader.parse(parsed)
                     model.traverse(child => {
                         child.material = new THREE.MeshPhongMaterial({
-                            map: TextureLoader.load(hat.texture.url)
+                            map: TextureLoader.load(hat.texture),
+                            side: THREE.DoubleSide
                         })
                     })
                     scene.add(model)
@@ -392,11 +381,12 @@ async function Render(userId, container, tryOnAsset = null) {
             }
         } else {
             for (let hat of userAssets.hats) {
-                parseOBJ(hat.mesh.url, parsed => {
+                parseOBJ(hat.mesh, parsed => {
                     let model = OBJLoader.parse(parsed)
                     model.traverse(child => {
                         child.material = new THREE.MeshPhongMaterial({
-                            map: TextureLoader.load(hat.texture.url)
+                            map: TextureLoader.load(hat.texture),
+                            side: THREE.DoubleSide
                         })
                     })
                     scene.add(model)

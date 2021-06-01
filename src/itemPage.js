@@ -52,12 +52,12 @@ const itemID = (!window.location.href.match(/[0-9]+/)) ? null : window.location.
 
 	const view3D = document.createElement("button")
 	view3D.classList = "button medium green f-right"
-	view3D.style = "position: relative; right: -45px;"
+	view3D.style = "position: relative; right: -45px; top: 7px"
 	view3D.innerText = "3D"
 
 	const tryOnBtt = document.createElement("button")
 	tryOnBtt.classList = "button medium green f-left"
-	tryOnBtt.style = "position: relative; left: -45px;"
+	tryOnBtt.style = "position: relative; left: -45px; top: 7px"
 	tryOnBtt.innerText = "Try On"
 
 	const toggleTryOn = color => {
@@ -96,10 +96,13 @@ const itemID = (!window.location.href.match(/[0-9]+/)) ? null : window.location.
 
 		// Download buttons are broken
 		const itemData = await getAssetURL(itemID)
-	
+		
 		const texture = new THREE.TextureLoader();
-		const mapOverlay = texture.load(itemData.texture.url);
-		const material = new THREE.MeshPhongMaterial({map: mapOverlay});
+		const mapOverlay = texture.load(itemData.texture);
+		const material = new THREE.MeshPhongMaterial({
+			map: mapOverlay,
+			side: THREE.DoubleSide
+		});
 		
 		const box3D = new THREE.Box3()
 		const OBJloader = new THREE.OBJLoader();
@@ -115,7 +118,7 @@ const itemID = (!window.location.href.match(/[0-9]+/)) ? null : window.location.
 			})
 		}
 
-		parseOBJ(itemData.mesh.url, parsed => {
+		parseOBJ(itemData.mesh, parsed => {
 			let model = OBJloader.parse(parsed)
 			model.traverse(child => {
 				child.material = material
@@ -161,7 +164,7 @@ const itemID = (!window.location.href.match(/[0-9]+/)) ? null : window.location.
 				toggleTryOn("green")
 
 				const pos = quad => { return {
-					"top": "-50px",
+					"top": "-43px",
 					[[quad]]: "5px"
 				}}
 
@@ -179,7 +182,7 @@ const itemID = (!window.location.href.match(/[0-9]+/)) ? null : window.location.
 			renderer.domElement.style.display = "none"
 
 			const pos = quad => { return {
-				"top": "",
+				"top": "7px",
 				[[quad]]: "-45px"
 			}}
 
@@ -231,7 +234,7 @@ const itemID = (!window.location.href.match(/[0-9]+/)) ? null : window.location.
 			toggleTryOn("red")
 
 			const pos = quad => { return {
-				"top": "-50px",
+				"top": "-43px",
 				[[quad]]: "5px"
 			}}
 
@@ -251,7 +254,7 @@ const itemID = (!window.location.href.match(/[0-9]+/)) ? null : window.location.
 			toggleTryOn("green")
 
 			const pos = quad => { return {
-				"top": "",
+				"top": "7px",
 				[[quad]]: "-45px"
 			}}
 

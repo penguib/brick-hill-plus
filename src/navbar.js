@@ -2,6 +2,7 @@ if (!window.localStorage.getItem("bhp-settings")) {
 	window.localStorage.setItem("bhp-settings", JSON.stringify({
 		forumImageEmbeds:  true,
         forumBadges: true,
+        forumPPD: true,
         forumSignature: "",
         messagesImageEmbeds: true,
         shopConversions: 0.0099 // 100 bucks - $0.99

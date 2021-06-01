@@ -1,27 +1,37 @@
 const avatarApi = "https://api.brick-hill.com/v1/games/retrieveAvatar?id="
+const bhpApi = "https://bhp.bhvalues.com/v1/item/"
 
 async function getAssetURL(id) {
+
+    const r = await fetch(bhpApi + id)
+    const json = await r.json()
+    let data = json.data
+
+    if (data.type && (data.mesh || data.texture)) {
+        data['id'] = id
+        return data
+    }
+
+    const cacheItem = async data => {
+        await fetch("https://bhp.bhvalues.com/v1/item/" + id, {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+    }
+    
+
     const polyApi = "https://api.brick-hill.com/v1/assets/getPoly/1/"
     const assetApi = "https://api.brick-hill.com/v1/assets/get/"
 
     const res = await fetch(polyApi + id)
-    let data = await res.json()
-    console.log(data);
+    data = await res.json()
+
     if (data.error)
         return null
     data = data[0]
-
-    /*
-
-        Return type:
-        {
-            mesh: url,
-            texture: url,
-            type: type,
-            extra: any
-        }
-
-    */
 
     switch (data.type) {
         case "hat": {
@@ -30,12 +40,16 @@ async function getAssetURL(id) {
             const texture = await fetch(assetApi + textureId)
             const mesh = await fetch(assetApi + meshId)
 
-            return {
-                texture: texture,
-                mesh:    mesh,
+            const item = {
+                texture: texture.url,
+                mesh:    mesh.url,
                 type:    data.type,
                 id:      id,
             }
+
+            await cacheItem(item)
+
+            return item
         }
         case "tool": {
             const textureId = data.texture.replace("asset://", "")
@@ -43,24 +57,32 @@ async function getAssetURL(id) {
             const texture = await fetch(assetApi + textureId)
             const mesh = await fetch(assetApi + meshId)
 
-            return {
-                texture: texture,
-                mesh:    mesh,
+            const item = {
+                texture: texture.url,
+                mesh:    mesh.url,
                 type:    data.type,
                 id:      id,
             }
+
+            await cacheItem(item)
+
+            return item
         }
         case "head": {
             const meshId  = data.mesh.replace("asset://", "")
             const mesh = await fetch(assetApi + meshId)
 
-            return {
+            const item = {
                 texture:   null,
-                mesh:      mesh,
+                mesh:      mesh.url,
                 type:      data.type,
                 id:        id,
                 headless: (id === 4859)
             }
+
+            await cacheItem(item)
+
+            return item
         }
         default: {
             if (!data.type)
@@ -68,15 +90,18 @@ async function getAssetURL(id) {
             const textureId  = data.texture.replace("asset://", "")
             const texture = await fetch(assetApi + textureId)
 
-            return {
-                texture: texture,
+            const item = {
+                texture: texture.url,
                 mesh:    null,
                 type:    data.type,
                 id:      id,
             }
+
+            cacheItem(item)
+
+            return item
         }
     }
-
 }
 
 async function getUserAssets(id) {
