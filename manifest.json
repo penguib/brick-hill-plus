@@ -9,7 +9,7 @@
             "matches": [
                 "https://www.brick-hill.com/*"
             ],
-            "js": [ "./src/navbar.js" ],
+            "js": [ "./lib/jquery.js", "./src/navbar.js" ],
             "run_at": "document_idle"
         },
         {
@@ -78,6 +78,12 @@
                 "./lib/OrbitControls.js", 
                 "./src/itemPage.js"
             ]
+        },
+        {
+            "matches": [
+                "https://www.brick-hill.com/customize/"
+            ],
+            "js": [ "./lib/jquery.js", "./src/avatar.customize.js" ]
         },
         {
             "matches": [

@@ -145,3 +145,21 @@ if (bhpSettings.forumImageEmbeds) {
         }
     }
 }
+
+const container = document.querySelectorAll("span.light-gray-text")
+for (let i = 0, len = container.length; i < len; i += 2) {
+
+    // Finding the users' join date to calculate total days
+    let date = container[i].innerText.match(/(\d+)\/(\d+)\/(\d+)/)
+    date = new Date(`${date[3]} ${date[2]} ${date[1]}`)
+
+    const days = Math.floor((new Date() - date) / 1000 / 60 / 60 / 24)
+    const posts = parseInt( container[ i + 1 ].innerText.match(/[\d,]+/)[0].replace(/,/g,"") )
+    const text = document.createElement("span")
+
+    text.className = "light-gray-text"
+    text.innerText = (posts/days).toFixed(1) + " posts per day"
+
+    document.querySelectorAll(".col-3-12")[ i / 2 ].appendChild(document.createElement("br"))
+    document.querySelectorAll(".col-3-12")[ i / 2 ].appendChild(text)
+}

@@ -288,4 +288,21 @@ $(document).ready(async () => {
         return
     })
 
+    if (document.querySelectorAll(".stats-table")) {
+
+        let date = document.getElementById("join-date").innerText.match(/(\d+)\/(\d+)\/(\d+)/)
+        date = new Date(`${date[3]} ${date[2]} ${date[1]}`)
+
+        const days = Math.floor((new Date() - date) / 1000 / 60 / 60 / 24)
+        const posts = parseInt(document.getElementById("forum-posts").innerText.match(/[\d,]+/)[0].replace(/,/g,""))
+        const text = document.createElement("td")
+
+        text.innerText = (posts / days).toFixed(1) + " posts per day"
+        const tr = document.createElement("tr")
+        tr.innerHTML = "<td><b>Posts per day:</b></td>"
+        tr.appendChild(text)
+        
+        document.querySelectorAll(".stats-table")[0].appendChild(tr)
+    }
+
 })

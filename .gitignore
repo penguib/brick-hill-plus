@@ -6,3 +6,6 @@ lib/
 
 # txt files
 *.txt
+
+# css files
+styles/
