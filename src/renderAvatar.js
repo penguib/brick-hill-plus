@@ -66,8 +66,8 @@ async function Render(userId, container, tryOnAsset = null) {
                                 // If they are wearing headless
                                 if (userAssets.head.headless || (tryOn?.type === "head" && tryOn?.headless)) {
                                     child.visible = false
-                                    box3D.setFromObject(child);
-                                    box3D.center(controls.target);
+                                    // box3D.setFromObject(child);
+                                    // box3D.center(controls.target);
                                     break
                                 }
                                 const faceData = userAssets.face
@@ -95,8 +95,8 @@ async function Render(userId, container, tryOnAsset = null) {
                                 bodyColor.material = headColor
                                 scene.add(bodyColor)
 
-                                box3D.setFromObject(child);
-                                box3D.center(controls.target);
+                                // box3D.setFromObject(child);
+                                // box3D.center(controls.target);
 
                                 break
                             }
@@ -245,10 +245,11 @@ async function Render(userId, container, tryOnAsset = null) {
 
                                         // Problem with transpareny with shirt + pants + tshirt
                                         child.material = new THREE.MeshPhongMaterial({
-                                            map: shirtMat
+                                            map: shirtMat,
+                                            transparent: true
                                         })
-
                                         child.renderOrder = 3
+
                                     } else {
                                         child.material = new THREE.MeshPhongMaterial({
                                             map: pantsMat,
@@ -279,9 +280,9 @@ async function Render(userId, container, tryOnAsset = null) {
                                         transparent: true
                                     });
                                     const plane = new THREE.Mesh( geometry, material );
-                                    plane.renderOrder = 2
                                     scene.add( plane );
 
+                                    plane.renderOrder = 3
                                     plane.position.y = 3 
                                     plane.position.z = 0.5001
                                 }
@@ -308,8 +309,8 @@ async function Render(userId, container, tryOnAsset = null) {
                 })
 
 
-                // box3D.setFromObject(object);
-                // box3D.center(controls.target);
+                box3D.setFromObject(object);
+                box3D.center(controls.target);
                 scene.add( object );
 
             },
