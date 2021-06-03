@@ -76,8 +76,7 @@ async function getAssetURL(id) {
                 texture:   null,
                 mesh:      mesh.url,
                 type:      data.type,
-                id:        id,
-                headless: (id === 4859)
+                id:        id
             }
 
             await cacheItem(item)

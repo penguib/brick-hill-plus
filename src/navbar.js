@@ -1,13 +1,7 @@
-if (!window.localStorage.getItem("bhp-settings")) {
-	window.localStorage.setItem("bhp-settings", JSON.stringify({
-		forumImageEmbeds:  true,
-        forumBadges: true,
-        forumPPD: true,
-        forumSignature: "",
-        messagesImageEmbeds: true,
-        shopConversions: 0.0099 // 100 bucks - $0.99
-	}))
-}
+if (!storage.checkProps("bhp-settings"))
+    storage.fillProps("bhp-settings")
+
+console.log(storage.get("bhp-settings"));
 
 let mainDiv = document.getElementsByClassName("bottom-bar")
 mainDiv[0].childNodes[0].nextSibling.innerHTML += "<li><a href='https://discord.gg/wWsGUfZw4Z'>Discord</a></li>"

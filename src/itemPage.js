@@ -1,4 +1,4 @@
-const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
+const bhpSettings = storage.get("bhp-settings")
 const bucksConversion = bhpSettings.shopConversions || 0.01
 const allowedItemTypes = [ "Hat", "Head", "Tool", "Face" ]
 const allowed3DItemTypes = [ "Hat", "Tool" ]

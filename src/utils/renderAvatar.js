@@ -64,10 +64,9 @@ async function Render(userId, container, tryOnAsset = null) {
                             case "Head_Head_Head_Circle.000": {
 
                                 // If they are wearing headless
-                                if (userAssets.head.headless || (tryOn?.type === "head" && tryOn?.headless)) {
+                                const headID = userAssets.head?.id || tryOn?.id
+                                if (Number(headID) === 4859) {
                                     child.visible = false
-                                    // box3D.setFromObject(child);
-                                    // box3D.center(controls.target);
                                     break
                                 }
                                 const faceData = userAssets.face
@@ -331,14 +330,14 @@ async function Render(userId, container, tryOnAsset = null) {
     }
 
     if (Object.keys(userAssets.head).length || tryOn?.type === "head") {
-        if (userAssets.head?.headless || tryOn?.headless)
-            return
-
-        const model = ((Object.keys(userAssets.head).length > 0) ? userAssets.head : tryOn)
-        quickLoad(model.mesh, new THREE.MeshPhongMaterial({
-            color: userAssets.colors.head,
-            side: THREE.DoubleSide
-        }))
+        const headID = userAssets.head?.id || tryOn?.id
+        if (Number(headID) !== 4859) {
+            const model = ((Object.keys(userAssets.head).length > 0) ? userAssets.head : tryOn)
+            quickLoad(model.mesh, new THREE.MeshPhongMaterial({
+                color: userAssets.colors.head,
+                side: THREE.DoubleSide
+            }))
+        }
     }
        
 

@@ -9,7 +9,12 @@
             "matches": [
                 "https://www.brick-hill.com/*"
             ],
-            "js": [ "./lib/jquery.js", "./src/navbar.js" ],
+            "js": [ 
+                "./lib/jquery.js", 
+                "./lib/LZString.js", 
+                "./src/utils/storage.js",
+                "./src/navbar.js" 
+            ],
             "run_at": "document_idle"
         },
         {
@@ -18,7 +23,7 @@
             ],
             "js": [ 
                 "./src/getAssets.js",
-                "./src/renderAvatar.js", 
+                "./src/utils/renderAvatar.js", 
                 "./lib/jquery.js", 
                 "./lib/three.js", 
                 "./lib/OBJLoader.js", 
@@ -61,7 +66,10 @@
                 "https://www.brick-hill.com/settings/",
                 "https://www.brick-hill.com/settings"
             ],
-            "js": [ "./src/settings.js" ]
+            "js": [
+                "./src/utils/storage.js",
+                "./src/settings.js" 
+            ]
         },
         {
             "matches": [
@@ -70,12 +78,13 @@
             "js": [ 
                 "./src/utils/brickHillPlus.js",
                 "./lib/jquery.js",
-                "./src/renderAvatar.js",
+                "./src/utils/renderAvatar.js",
                 "./src/getAssets.js",
                 "./lib/three.js", 
                 "./lib/MTLLoader.js", 
                 "./lib/OBJLoader.js", 
                 "./lib/OrbitControls.js", 
+                "./src/utils/storage.js",
                 "./src/itemPage.js"
             ]
         },
@@ -83,7 +92,7 @@
             "matches": [
                 "https://www.brick-hill.com/customize/"
             ],
-            "js": [ "./lib/jquery.js", "./src/avatar.customize.js" ]
+            "js": [ "./lib/jquery.js", "./src/avatar/customize.js" ]
         },
         {
             "matches": [

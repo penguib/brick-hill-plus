@@ -1,5 +1,5 @@
-const bhpSettings = window.localStorage.getItem("bhp-settings")
-const parsedSettings = (bhpSettings) ? JSON.parse(bhpSettings) : {}
+const bhpSettings = storage.get("bhp-settings")
+const parsedSettings = bhpSettings ||  {}
 const $ = e => { return document.getElementById(e) }
 const bhplusSettingsColumn = document.createElement("div")
 const settingsMainDiv = document.getElementsByClassName("main-holder grid")[0]
@@ -25,10 +25,10 @@ function conversionToSelected(value) {
     return ""
 } 
 
-const forumImageEmbeds = (parsedSettings.forumImageEmbeds !== undefined) ? booleanToChecked(parsedSettings.forumImageEmbeds) : "checked"
-const forumBadges = (parsedSettings.forumBadges !== undefined) ? booleanToChecked(parsedSettings.forumBadges) : "checked"
-const forumPPD = (parsedSettings.forumPPD !== undefined) ? booleanToChecked(parsedSettings.forumPPD) : "checked"
-const forumSignature = (parsedSettings.forumSignature !== undefined) ? parsedSettings.forumSignature : ""
+const forumImageEmbeds = (parsedSettings.f_ImageEmbeds !== undefined) ? booleanToChecked(parsedSettings.f_ImageEmbeds) : "checked"
+const forumBadges      = (parsedSettings.f_Badges !== undefined)      ? booleanToChecked(parsedSettings.f_Badges)      : "checked"
+const forumPPD         = (parsedSettings.f_PPD !== undefined)         ? booleanToChecked(parsedSettings.f_PPD)         : "checked"
+const forumSignature   = (parsedSettings.f_Signature !== undefined)   ? parsedSettings.f_Signature                     : ""
 
 const messagesImageEmbeds = (parsedSettings.messagesImageEmbeds !== undefined) ? booleanToChecked(parsedSettings.messagesImageEmbeds) : "checked"
 
@@ -95,13 +95,15 @@ $("bhp-forumSignature").value = forumSignature
 
 document.getElementById("bhp-save").addEventListener("click", () => {
 
-    window.localStorage.setItem("bhp-settings", JSON.stringify({
-        forumImageEmbeds: $("bhp-forumImageEmbeds").checked,
-        forumBadges: $("bhp-forumBadges").checked,
-        forumSignature: $("bhp-forumSignature").value,
-        messagesImageEmbeds: $("bhp-messagesImageEmbeds").checked,
-        shopConversions: $("bhp-shopConversions").value
-    }))
+    storage.set("bhp-settings", {
+        f_ImageEmbeds: $("bhp-forumImageEmbeds").checked,
+        f_Badges: $("bhp-forumBadges").checked,
+        f_Signature: $("bhp-forumSignature").value,
+
+        m_ImageEmbeds: $("bhp-messagesImageEmbeds").checked,
+
+        s_Conversions: $("bhp-shopConversions").value
+    })
 
     $("bhp-success").style = ""
 })
