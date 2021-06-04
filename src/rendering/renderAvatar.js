@@ -1,4 +1,7 @@
-async function Render(userId, container, tryOnAsset = null) {
+var browser = browser || chrome
+
+async function renderUser(userId, container, tryOnAsset = null) {
+
     if (!userId)
         return null
 
@@ -25,13 +28,25 @@ async function Render(userId, container, tryOnAsset = null) {
         tryOn = await getAssetURL(tryOnAsset)
 
     const box3D = new THREE.Box3()
+    const config = await getConfig()
+    const userConfig = config.user
 
     const scene = new THREE.Scene()
-    const light = new THREE.HemisphereLight(0xFFFFFF, 0xB1B1B1, 1);
+    const light = new THREE.HemisphereLight(
+        userConfig.light.skyColor, 
+        userConfig.light.groundColor, 
+        userConfig.light.intensity
+        );
     scene.add(light);
 
-    const camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
-    camera.position.set( -2.97, 5.085, 4.52 );
+    const camera = new THREE.PerspectiveCamera(
+        userConfig.camera.fov, 
+        userConfig.camera.aspect, 
+        userConfig.camera.near,
+        userConfig.camera.far
+        );
+    // camera.position.set(-2.33208, 105.217, -4.70999)
+    // camera.position.set( -2.97, 5.085, 4.52 );
 
     const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
 

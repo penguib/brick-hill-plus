@@ -4,10 +4,15 @@ const allowedItemTypes = [ "Hat", "Head", "Tool", "Face" ]
 const allowed3DItemTypes = [ "Hat", "Tool" ]
 const userID = $("meta[name='user-data']")?.attr("data-id")
 
+// To keep track if the user actually wants to see them in 3D
+// No reason to render it if the user won't use it
+let loadedItem = false
+let loadedUser = false
+
 // only set itemType if we are on an item page, not just /shop/
 const itemType = (!window.location.href.match(/[0-9]+/)) ? null : document.getElementsByClassName("padding-bottom")[0].childNodes[1].childNodes[3].innerText
 const itemID = (!window.location.href.match(/[0-9]+/)) ? null : window.location.href.match(/[0-9]+/)[0];
-let testData = null
+
 $(document).ready(async() => {
 	(async () => {
 
@@ -35,6 +40,87 @@ $(document).ready(async() => {
 		const userContainer = document.querySelector("div.content.text-center.bold.medium-text.relative.ellipsis")
 		$(userContainer).css("outline", "none")
 		const itemImage = document.getElementById("item-img")
+
+		const view3D = document.createElement("button")
+		view3D.classList = "button medium green f-right"
+		view3D.style = "position: relative; right: -45px; top: 7px"
+		view3D.innerText = "3D"
+
+		const tryOnBtt = document.createElement("button")
+		tryOnBtt.classList = "button medium green f-left"
+		tryOnBtt.style = "position: relative; left: -45px; top: 7px"
+		tryOnBtt.innerText = "Try On"
+	
+		if (allowed3DItemTypes.includes(itemType)) {
+			itemBox.insertBefore(view3D, itemBoxChildren[itemBoxChildren.length - 1])
+
+			view3D.addEventListener("click", async () => {
+				const itemImg      = $("#item-img")
+				const avatarViewer = $("#avatar-viewer")
+				if (view3D.innerText.includes("3D")) {
+
+					// Setting the height prevents an annoying resizing bug
+					$(itemContainer).css("height", comp.height)
+
+					if (!loadedItem) {
+						itemImg.hide()
+						if (avatarViewer.length)
+							avatarViewer.hide()
+
+						$(loadingContainer).show()
+						loadedItem = await renderItem(itemID, itemBox)
+						$(loadingContainer).hide()
+
+						itemBox.insertBefore(loadedItem.renderer.domElement, itemBoxChildren[0])
+					}
+						
+					$(loadedItem.renderer.domElement).show()
+					
+					view3D.innerText = "2D"
+					
+					itemImg.hide()
+					avatarViewer.hide()
+					toggleTryOn("green")
+	
+					const pos = quad => { return {
+						"top": "-43px",
+						[[quad]]: "5px"
+					}}
+	
+					$(view3D).css( pos("right") )
+					$(tryOnBtt).css( pos("left") )
+	
+					// Reset camera every time they want to see the item again
+					loadedItem.camera.position.set( -2.97, 5.085, 4.52 );
+			
+					itemBox.style.padding = "0"
+					return
+				}
+	
+				view3D.innerText = "3D"
+				loadedItem.renderer.domElement.style.display = "none"
+	
+				const pos = quad => { return {
+					"top": "7px",
+					[[quad]]: "-45px"
+				}}
+	
+				$(loadedItem.renderer.domElement).hide()
+				avatarViewer.hide()
+				itemImg.show()
+				toggleTryOn("green")
+	
+				$(itemContainer).css("height", "")
+				$(view3D).css( pos("right") )
+				$(tryOnBtt).css( pos("left") )
+			
+				// Reset camera every time they want to see the item again
+				loadedItem.camera.position.set( -2.97, 5.085, 4.52 );
+		
+				itemBox.style.padding = "50px"
+			})
+		}
+		itemBox.insertBefore(tryOnBtt, itemBoxChildren[itemBoxChildren.length - 1])
 	
 		$(li).click(() => {
 			navigator.clipboard.writeText(itemImage.src)
@@ -46,21 +132,24 @@ $(document).ready(async() => {
 			$(a).text("Copied ✓")
 		})
 	
-		if (!ul.children[0])
+		if (!ul?.children[0])
 			ul.appendChild(li)
 		else
 			ul.insertBefore(li, ul.children[0])
+
+		// const loadingContainer = document.createElement("div")
 	
-		const view3D = document.createElement("button")
-		view3D.classList = "button medium green f-right"
-		view3D.style = "position: relative; right: -45px; top: 7px"
-		view3D.innerText = "3D"
+		// //let containerHeight = ($(itemBox).hasClass("special") || $(itemBox).hasClass("owns")) ? "271px" : "279px"
+
+		// // $(loadingContainer).css("height", window.getComputedStyle(document.getElementById("item-img")).height)
+		// $(loadingContainer).hide()
+		const loadingContainer = document.createElement("div")
+		loadingContainer.classList = "loader"
+		$(loadingContainer).hide()
+		//loadingContainer.appendChild(loadingGif)
 	
-		const tryOnBtt = document.createElement("button")
-		tryOnBtt.classList = "button medium green f-left"
-		tryOnBtt.style = "position: relative; left: -45px; top: 7px"
-		tryOnBtt.innerText = "Try On"
-	
+		itemBox.insertBefore(loadingContainer, itemImage)
+
 		const toggleTryOn = color => {
 			const btt = $(tryOnBtt)
 			switch (color) {
@@ -89,159 +178,47 @@ $(document).ready(async() => {
 			
 			container.insertBefore(element, secondDiv.nextSibling)
 		}
-
-		if (allowed3DItemTypes.includes(itemType)) {
-			const scene = new THREE.Scene()
-			const light = new THREE.HemisphereLight(0xFFFFFF, 0xB1B1B1, 1);
-			scene.add(light);
-			
-			const camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
-			camera.position.set( -2.97, 5.085, 4.52 );
-			
-			const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
-			renderer.setSize( 375, 375 );
-			renderer.domElement.style = "display: none; user-select: none; width: 100%"
-			$(renderer.domElement).attr('id', 'item-viewer')
-	
-			itemBox.insertBefore(renderer.domElement, itemBoxChildren[0])
-			itemBox.insertBefore(view3D, itemBoxChildren[itemBoxChildren.length - 1])
-	
-			// Download buttons are broken
-			
-			const texture = new THREE.TextureLoader();
-			const mapOverlay = texture.load(itemData.texture);
-			const material = new THREE.MeshPhongMaterial({
-				map: mapOverlay,
-				side: THREE.DoubleSide
-			});
-			
-			const box3D = new THREE.Box3()
-			const OBJloader = new THREE.OBJLoader();
-	
-			const parseOBJ = (mesh, cb) => {
-				const FileLoader = new THREE.FileLoader()
-				FileLoader.load(mesh, data => {
-					const lines = data.split('\n')
-					const parsedFile = lines.filter(line => {
-						return line.indexOf("l") != 0
-					})
-					cb(parsedFile.join('\r\n'))
-				})
-			}
-	
-			parseOBJ(itemData.mesh, parsed => {
-				let model = OBJloader.parse(parsed)
-				model.traverse(child => {
-					child.material = material
-				})
-	
-				box3D.setFromObject(model);
-				box3D.center(controls.target);
-				scene.add(model)
-			})
-			
-			// camera controls
-			var controls = new THREE.OrbitControls( camera, itemBox );
-			controls.autoRotate = true;
-			controls.enableZoom = true;
-			controls.minDistance = 1;
-			controls.maxDistance = 10;
-			controls.enablePan = false
-			controls.update()
-			
-			
-			function animate() {
-				controls.update()
-				requestAnimationFrame(animate);
-				renderer.render(scene, camera);
-			}
-			
-			animate();
-			
-	
-			view3D.addEventListener("click", () => {
-				const itemViewer   = $("#item-viewer")
-				const itemImg      = $("#item-img")
-				const avatarViewer = $("#avatar-viewer")
-				if (view3D.innerText.includes("3D")) {
-					
-					// Setting the height prevents an annoying resizing bug
-					$(itemContainer).css("height", comp.height)
-					view3D.innerText = "2D"
-					
-					itemViewer.show()
-					itemImg.hide()
-					avatarViewer.hide()
-					toggleTryOn("green")
-	
-					const pos = quad => { return {
-						"top": "-43px",
-						[[quad]]: "5px"
-					}}
-	
-					$(view3D).css( pos("right") )
-					$(tryOnBtt).css( pos("left") )
-	
-					// Reset camera every time they want to see the item again
-					camera.position.set( -2.97, 5.085, 4.52 );
-			
-					itemBox.style.padding = "0"
-					return
-				}
-	
-				view3D.innerText = "3D"
-				renderer.domElement.style.display = "none"
-	
-				const pos = quad => { return {
-					"top": "7px",
-					[[quad]]: "-45px"
-				}}
-	
-				itemViewer.hide()
-				avatarViewer.hide()
-				itemImg.show()
-				toggleTryOn("green")
-	
-				$(itemContainer).css("height", "")
-				$(view3D).css( pos("right") )
-				$(tryOnBtt).css( pos("left") )
-			
-				// Reset camera every time they want to see the item again
-				camera.position.set( -2.97, 5.085, 4.52 );
-		
-				itemBox.style.padding = "50px"
-			})
-		}
 	
 		// If the userID is undefined, then the user isn't logged in
 		// Users not logged in can't try on items
 		if (!userID)
 			return
-	
-		itemBox.insertBefore(tryOnBtt, itemBoxChildren[itemBoxChildren.length - 1])
-	
-		const rendererData = await Render(userID, itemBox, itemID)
-		const avatarRenderer = rendererData.renderer
-		const avatarCamera = rendererData.camera
-		avatarRenderer.setSize( 375, 375 );
-		avatarRenderer.domElement.style = "display: none; user-select: none; width: 100%"
-		$(avatarRenderer.domElement).attr('id', 'avatar-viewer')
-		itemBox.insertBefore(avatarRenderer.domElement, itemBoxChildren[0])
-	
-	
-		$(tryOnBtt).click(() => {
+
+		$(tryOnBtt).click(async () => {
 			const itemViewer   = $("#item-viewer")
 			const itemImg      = $("#item-img")
-			const avatarViewer = $("#avatar-viewer")
 			const cameraPosition = new THREE.Vector3(-3.667381161503485, 5.669098837327955, 5.5813344027963065)
 	
 			if (tryOnBtt.innerText.toLowerCase().includes("try on")) {
 	
-				// Can't pass in the vector unfortunately
-				avatarCamera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
-	
 				$(itemContainer).css("height", comp.height)
-				avatarViewer.show()
+
+				if (!loadedUser) {
+					$(loadingContainer).show()
+
+					itemImg.hide()
+					if (itemViewer.length)
+						itemViewer.hide()
+					$(view3D).text("3D")
+
+					loadedUser = await renderUser(userID, itemBox, itemID) 
+					$(loadingContainer).hide()
+
+					const avatarRenderer = loadedUser.renderer
+					const avatarCamera = loadedUser.camera
+					avatarRenderer.setSize( 375, 375 );
+					avatarRenderer.domElement.style = "display: none; user-select: none; width: 100%"
+					$(avatarRenderer.domElement).attr('id', 'avatar-viewer')
+					itemBox.insertBefore(avatarRenderer.domElement, itemBoxChildren[0])
+
+					avatarCamera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+				
+				}
+
+				// Can't pass in the vector unfortunately
+				loadedUser.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+
+				$(loadedUser.renderer.domElement).show()
 				toggleTryOn("red")
 	
 				const pos = quad => { return {
@@ -250,10 +227,11 @@ $(document).ready(async() => {
 				}}
 	
 				itemImg.hide()
-				if (itemViewer.length) {
+				if (itemViewer.length)
 					itemViewer.hide()
-					$(view3D).css( pos("right") )
-				}
+					
+				$(view3D).css( pos("right") )
+				$(view3D).text("3D")
 				$(tryOnBtt).css( pos("left") )
 	
 				itemBox.style.padding = "0"
@@ -270,11 +248,10 @@ $(document).ready(async() => {
 				}}
 	
 				itemImg.show()
-				if (itemViewer.length) {
+				if (itemViewer.length)
 					itemViewer.hide()
-					$(view3D).css( pos("right") )
-				}
-				avatarViewer.hide()
+				$(view3D).css( pos("right") )
+				$(loadedUser.renderer.domElement).hide()
 				$(tryOnBtt).css( pos("left") )
 	
 				itemBox.style.padding = "0"

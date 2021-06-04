@@ -23,7 +23,8 @@
             ],
             "js": [ 
                 "./src/getAssets.js",
-                "./src/utils/renderAvatar.js", 
+                "./src/rendering/getConfig.js",
+                "./src/rendering/renderAvatar.js", 
                 "./lib/jquery.js", 
                 "./lib/three.js", 
                 "./lib/OBJLoader.js", 
@@ -78,13 +79,15 @@
             "js": [ 
                 "./src/utils/brickHillPlus.js",
                 "./lib/jquery.js",
-                "./src/utils/renderAvatar.js",
+                "./src/rendering/getConfig.js",
+                "./src/rendering/renderAvatar.js",
                 "./src/getAssets.js",
                 "./lib/three.js", 
                 "./lib/MTLLoader.js", 
                 "./lib/OBJLoader.js", 
                 "./lib/OrbitControls.js", 
                 "./src/utils/storage.js",
+                "./src/rendering/renderItem.js",
                 "./src/itemPage.js"
             ]
         },
@@ -107,6 +110,9 @@
             ],
             "js": [ "./src/friends.js" ]
         }
+    ],
+    "web_accessible_resources": [
+        "/src/rendering/config.json"
     ],
     "icons": {
         "16":"./icons/PLUS16.png",
