@@ -1,5 +1,8 @@
+
+// Need a fallback when the data fails
+
 function getBHPData(callback) {
-	fetch(`https://api.bhvalues.com/v1/item/${itemID}`)
+	fetch(`https://api.brick-hub.com/v1/item/${itemID}`)
 	.then(res => res.json())
 	.then(data => {
 		callback(data)
@@ -15,7 +18,7 @@ function getBHPlusData() {
 	
 	const linkA = document.createElement("a")
 	linkA.innerText = "View Owners and More Details"
-	linkA.href = `https://www.bhvalues.com/item/${itemID}`
+	linkA.href = `https://trade.brick-hub.com/item/${itemID}`
 
 	const mainDiv = document.createElement("div")
 	mainDiv.className = "item-stats"
@@ -36,12 +39,12 @@ function getBHPlusData() {
 	const infoText = document.createElement("a")
 	infoText.innerText = "Item stats and info powered by "
 	infoText.style = "font-size:12px"
-	infoText.href = "https://www.bhvalues.com/"
+	infoText.href = "https://trade.brick-hub.com/"
 
 	const bhvLink = document.createElement("a")
 	bhvLink.style = "color:cornflowerblue;font-size:12px"
 	bhvLink.innerText = "Brick Hill Values"
-	bhvLink.href = "https://www.bhvalues.com/"
+	bhvLink.href = "https://trade.brick-hub.com/"
 
 	getBHPData(data => {
 		if (data.err) {
@@ -50,7 +53,7 @@ function getBHPlusData() {
 			const okLink = document.createElement("a")
 			okLink.style = "color:cornflowerblue"
 			okLink.innerText = "Brick Hill Values"
-			okLink.href = "https://www.bhvalues.com/item/" + itemID
+			okLink.href = "https://trade.brick-hub.com/item/" + itemID
 			linkA.appendChild(okLink)
 			linkDiv.appendChild(linkA)
 			return

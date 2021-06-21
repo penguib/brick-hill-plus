@@ -2,7 +2,7 @@ const url = window.location.href
 const userId = url.match(/-?[0-9]+/)[0]
 const api = "https://api.brick-hill.com/v1/games/retrieveAvatar?id="
 const hatApi = "https://api.brick-hill.com/v1/shop/"
-const userApi = "https://api.bhvalues.com/v1/user/"
+const userApi = "https://api.brick-hub.com/v1/user/"
 
 // Creatubg each element with creatElement to prevent XSS
 // Thanks to Dragonian 
@@ -113,12 +113,12 @@ async function generateUserInfo() {
         const aCAdd = document.createElement("a")
         aCAdd.style = "color: cornflowerblue"
         aCAdd.innerText = "Click here "
-        aCAdd.href = "https://www.bhvalues.com/user/" + userId
+        aCAdd.href = "https://trade.brick-hub.com/user/" + userId
         contentDiv.appendChild(aCAdd)
 
         const aAdd = document.createElement("a")
         aAdd.innerText = "to add them!"
-        aCAdd.href = "https://www.bhvalues.com/user/" + userId
+        aCAdd.href = "https://trade.brick-hub.com/user/" + userId
         contentDiv.appendChild(aAdd)
 
     } else {
@@ -152,12 +152,12 @@ async function generateUserInfo() {
         }
     
         const aDetails = document.createElement("a")
-        aDetails.href = "https://www.bhvalues.com/user/" + userId
+        aDetails.href = "https://trade.brick-hub.com/user/" + userId
         aDetails.innerText = "View more with "
         contentDiv.appendChild(aDetails)
     
         const aBHV = document.createElement("a")
-        aBHV.href = "https://www.bhvalues.com/user/" + userId
+        aBHV.href = "https://trade.brick-hub.com/user/" + userId
         aBHV.style = "color: cornflowerblue"
         aBHV.innerText = "Brick Hill Values"
         contentDiv.appendChild(aBHV)
@@ -165,9 +165,26 @@ async function generateUserInfo() {
 
     return mainDiv
 }
+const userContainer = document.querySelector("div.content.text-center.bold.medium-text.relative.ellipsis")
+$(userContainer).css("outline", "none")
+const view3D = document.createElement("button")
+
+view3D.classList = "button medium green f-right"
+$(view3D).css({
+    "position": "relative",
+})
+view3D.innerText = "3D"
+
+const userDescription = document.querySelector("div.user-description-box")
+
+userContainer.insertBefore(view3D, userDescription)
+userContainer.insertBefore(document.createElement("br"), view3D)
+
+for (let i = 0; i < 2; ++i)
+    userContainer.insertBefore(document.createElement("br"), userDescription)
 
 // Checking for friends because it was weirdly messing up the formatting of the page
-if (userId && !window.location.href.includes("friends")) {
+if ( (userId && !window.location.href.includes("friends")) && bhpSettings.p_BHV) {
 
     if (userId == 127118) {
         let username = document.getElementsByClassName("ellipsis")[3]
@@ -206,10 +223,17 @@ $(document).ready(async () => {
     a.innerText = "Copy Avatar URL"
     li.appendChild(a)
 
-    const userContainer = document.querySelector("div.content.text-center.bold.medium-text.relative.ellipsis")
-    $(userContainer).css("outline", "none")
     const imgs = $(userContainer).find('img')
     const userThumbnail = imgs.toArray().find(i => i.src.includes("brkcdn"))
+
+    const loadingContainer = document.createElement('div')
+    $(loadingContainer).css("height", "327px")
+    $(loadingContainer).hide()
+    const loadingGif = document.createElement('div')
+    loadingGif.classList = "loader"
+    loadingContainer.appendChild(loadingGif)
+
+    userContainer.insertBefore(loadingContainer, userThumbnail)
 
     $(li).click(() => {
         navigator.clipboard.writeText(userThumbnail.src)
@@ -221,52 +245,41 @@ $(document).ready(async () => {
         $(a).text("Copied ✓")
     })
 
-    if (!ul.children[0])
+    if (!ul?.children[0])
         ul.appendChild(li)
     else
         ul.insertBefore(li, ul.children[0])
 
-    
-    /*  Renderer  */
-
-    const rendererData = await Render(userId, userContainer)
-    const canvas = rendererData.renderer
-    const camera = rendererData.camera
-
-    canvas.setSize( 325, 327 );
-    $(canvas.domElement).css({
-        "margin-right": "auto",
-        "margin-left": "auto"
-    })
-    $(canvas.domElement).hide()
-
-    const view3D = document.createElement("button")
-
-    view3D.classList = "button medium green f-right"
-    $(view3D).css({
-        "position": "relative",
-    })
-	view3D.innerText = "3D"
-
-    const userDescription = document.querySelector("div.user-description-box")
-
-    userContainer.insertBefore(canvas.domElement, userDescription)
-    userContainer.insertBefore(view3D, userDescription)
-    
-    userContainer.insertBefore(document.createElement("br"), view3D)
-
-    for (let i = 0; i < 2; ++i)
-        userContainer.insertBefore(document.createElement("br"), userDescription)
-
-    $(view3D).click(() => {
+    let loaded3D = false
+    $(view3D).click(async () => {
         const btt  = $(view3D)
         const text = btt.text()
         const cameraPosition = new THREE.Vector3(-2.9850597402271473, 5.024487076222519, 4.542919202987628)
 
         if (text.includes("3D")) {
 
-            camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
-            $(canvas.domElement).show()
+            if (!loaded3D) {
+                $(userThumbnail).hide()
+                $(loadingContainer).show()
+                loaded3D = await renderUser(userId, userContainer)
+                $(loadingContainer).hide()
+
+                const canvas = loaded3D.renderer
+                const camera = loaded3D.camera
+
+                canvas.setSize( 325, 327 );
+                $(canvas.domElement).css({
+                    "margin-right": "auto",
+                    "margin-left": "auto"
+                })
+
+                userContainer.insertBefore(canvas.domElement, $(userThumbnail).next()[0])
+                camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+
+            } else {
+                loaded3D.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+                $(loaded3D.renderer.domElement).show()
+            }
 
             btt.text("2D")
             btt.removeClass("green")
@@ -277,7 +290,8 @@ $(document).ready(async () => {
             return
         }
 
-        $(canvas.domElement).hide()
+
+        $(loaded3D.renderer.domElement).hide()
 
         btt.text("3D")
         btt.removeClass("blue")

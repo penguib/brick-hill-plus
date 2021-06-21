@@ -2,12 +2,11 @@ const messageContainer = document.getElementsByClassName("content")[0]
 const messageContent = messageContainer.childNodes[3]
 const imgurRegex = /https:\/\/(i.)?imgur.com(\/a|\/gallery)?\/[0-9a-zA-Z]+(.png|.gif|.jpg|.jpeg)/g
 const discordRegex = /https:\/\/cdn\.discordapp\.com\/attachments\/[0-9]+\/[0-9]+\/[a-zA-Z0-9\.\-\_\-]+(.png|.gif|.jpg|.jpeg)/g
-const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
 
 let linkCopies = []
 
 let match = messageContent.innerHTML.match(imgurRegex) || messageContent.innerHTML.match(discordRegex)
-if (bhpSettings.messagesImageEmbeds) {
+if (bhpSettings.m_ImageEmbeds) {
 	if (match) {
 		for (link in match) {
 	

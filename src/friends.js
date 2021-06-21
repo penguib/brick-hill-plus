@@ -33,6 +33,8 @@ successBanner.className = "alert success"
 successBanner.style = "display:none"
 friendsCard.insertBefore(successBanner, friendsCard.childNodes[0])
 
+var browser = browser || chrome
+
 acceptAllButton.addEventListener("click", () => {
     browser.runtime.sendMessage({
         type: "accept",

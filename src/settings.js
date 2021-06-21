@@ -1,5 +1,3 @@
-const bhpSettings = window.localStorage.getItem("bhp-settings")
-const parsedSettings = (bhpSettings) ? JSON.parse(bhpSettings) : {}
 const $ = e => { return document.getElementById(e) }
 const bhplusSettingsColumn = document.createElement("div")
 const settingsMainDiv = document.getElementsByClassName("main-holder grid")[0]
@@ -12,26 +10,27 @@ bhplusSettingsCard.className = "card"
 
 
 // this is so that we can check the checkboxes that they saved
-function booleanToChecked(value) {
-    if (value)
-        return "checked"
-    return ""
+const booleanToChecked = value => {
+    return (value) ? "checked" : ""
 }
 
 // same as above, but instead of "checked" it's "selected"
-function conversionToSelected(value) {
-    if (value === Number(parsedSettings.shopConversions))
-        return "selected"
-    return ""
-} 
 
-const forumImageEmbeds = (parsedSettings.forumImageEmbeds !== undefined) ? booleanToChecked(parsedSettings.forumImageEmbeds) : "checked"
-const forumBadges = (parsedSettings.forumBadges !== undefined) ? booleanToChecked(parsedSettings.forumBadges) : "checked"
-const forumPPD = (parsedSettings.forumPPD !== undefined) ? booleanToChecked(parsedSettings.forumPPD) : "checked"
-const forumSignature = (parsedSettings.forumSignature !== undefined) ? parsedSettings.forumSignature : ""
+const conversionToSelected = value => {
+    return (value === Number(bhpSettings.shopConversions)) ? "selected" : ""
+}
 
-const messagesImageEmbeds = (parsedSettings.messagesImageEmbeds !== undefined) ? booleanToChecked(parsedSettings.messagesImageEmbeds) : "checked"
+const forumImageEmbeds = (bhpSettings.f_ImageEmbeds !== undefined) ? booleanToChecked(bhpSettings.f_ImageEmbeds) : "checked"
+const forumBadges      = (bhpSettings.f_Badges !== undefined)      ? booleanToChecked(bhpSettings.f_Badges)      : "checked"
+const forumPPD         = (bhpSettings.f_PPD !== undefined)         ? booleanToChecked(bhpSettings.f_PPD)         : "checked"
+const forumSignature   = (bhpSettings.f_Signature !== undefined)   ? bhpSettings.f_Signature                     : ""
 
+const messagesImageEmbeds = (bhpSettings.m_ImageEmbeds !== undefined) ? booleanToChecked(bhpSettings.m_ImageEmbeds) : "checked"
+
+const profilesBHV = (bhpSettings.p_BHV !== undefined) ? booleanToChecked(bhpSettings.p_BHV) : "checked"
+const shopBHV     = (bhpSettings.s_BHV !== undefined) ? booleanToChecked(bhpSettings.s_BHV) : "checked"
+
+const navbarButton  = (bhpSettings.n_CustomButton.name !== "") ? bhpSettings.n_CustomButton : { name: "", link: "" }
 
 bhplusSettingsCard.innerHTML = `
                 <div id="bhp-success" class="alert success" style="display:none">Brick Hill+ settings have been saved</div>
@@ -76,11 +75,22 @@ bhplusSettingsCard.innerHTML = `
                         </div>
                     </div>
                     <br>
+                    <div class="block">
+                        <span class="dark-gray-text" style="padding-bottom: 5px;">Brick Hill Values</span>
+                        <input class="f-right" type="checkbox" id="bhp-shopBHV" ${shopBHV}>
+                    </div>
                     <hr>
                     <span class="dark-gray-text bold block" style="padding-bottom: 5px;">Navbar</span>
                     <span class="dark-gray-text" style="padding-bottom: 5px;">Custom Button</span>
                     <input id="bhp-CBName" class="block" maxlength="20" placeholder="Button name" style="margin-bottom: 6px;" type="text"></input>
                     <input id="bhp-CBLink" class="block" placeholder="Button link" style="margin-bottom: 6px;" type="text"></input>
+                    <hr>
+                    <span class="dark-gray-text bold block" style="padding-bottom: 5px;">Profiles</span>
+                    <div class="block">
+                        <span class="dark-gray-text" style="padding-bottom: 5px;">Brick Hill Values</span>
+                        <input class="f-right" type="checkbox" id="bhp-userBHV" ${profilesBHV}>
+                    </div>
+                    <br>
                     <button id="bhp-save" class="button small blue">Save</button>
                     <br>
                 </div>
@@ -92,16 +102,31 @@ bhplusSettingsColumn.appendChild(bhplusSettingsCard)
 // appending the text after the element is in the DOM to prevent XSS
 // thanks to Dragonian
 $("bhp-forumSignature").value = forumSignature
+$("bhp-CBName").value = navbarButton.name
+$("bhp-CBLink").value = navbarButton.link
+
 
 document.getElementById("bhp-save").addEventListener("click", () => {
 
-    window.localStorage.setItem("bhp-settings", JSON.stringify({
-        forumImageEmbeds: $("bhp-forumImageEmbeds").checked,
-        forumBadges: $("bhp-forumBadges").checked,
-        forumSignature: $("bhp-forumSignature").value,
-        messagesImageEmbeds: $("bhp-messagesImageEmbeds").checked,
-        shopConversions: $("bhp-shopConversions").value
-    }))
+    storage.set("bhp-settings", {
+        f_ImageEmbeds: $("bhp-forumImageEmbeds").checked,
+        f_Badges:      $("bhp-forumBadges").checked,
+        f_Signature:   $("bhp-forumSignature").value,
+        f_PPD:         $("bhp-forumPPD").checked,
+
+        m_ImageEmbeds: $("bhp-messagesImageEmbeds").checked,
+
+        s_Conversions: $("bhp-shopConversions").value,
+        s_BHV:         $("bhp-shopBHV").checked,
+
+        p_BHV:         $("bhp-userBHV").checked,
+
+        n_CustomButton: {
+            name: $("bhp-CBName").value,
+            link: $("bhp-CBLink").value
+        }
+
+    })
 
     $("bhp-success").style = ""
 })

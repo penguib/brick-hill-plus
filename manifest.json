@@ -9,7 +9,12 @@
             "matches": [
                 "https://www.brick-hill.com/*"
             ],
-            "js": [ "./lib/jquery.js", "./src/navbar.js" ],
+            "js": [ 
+                "./lib/jquery.js", 
+                "./lib/LZString.js", 
+                "./src/utils/storage.js",
+                "./src/navbar.js" 
+            ],
             "run_at": "document_idle"
         },
         {
@@ -18,7 +23,8 @@
             ],
             "js": [ 
                 "./src/getAssets.js",
-                "./src/renderAvatar.js", 
+                "./src/rendering/getConfig.js",
+                "./src/rendering/renderAvatar.js", 
                 "./lib/jquery.js", 
                 "./lib/three.js", 
                 "./lib/OBJLoader.js", 
@@ -61,7 +67,9 @@
                 "https://www.brick-hill.com/settings/",
                 "https://www.brick-hill.com/settings"
             ],
-            "js": [ "./src/settings.js" ]
+            "js": [
+                "./src/settings.js" 
+            ]
         },
         {
             "matches": [
@@ -69,13 +77,14 @@
             ],
             "js": [ 
                 "./src/utils/brickHillPlus.js",
-                "./lib/jquery.js",
-                "./src/renderAvatar.js",
+                "./src/rendering/getConfig.js",
+                "./src/rendering/renderAvatar.js",
                 "./src/getAssets.js",
                 "./lib/three.js", 
                 "./lib/MTLLoader.js", 
                 "./lib/OBJLoader.js", 
                 "./lib/OrbitControls.js", 
+                "./src/rendering/renderItem.js",
                 "./src/itemPage.js"
             ]
         },
@@ -83,7 +92,7 @@
             "matches": [
                 "https://www.brick-hill.com/customize/"
             ],
-            "js": [ "./lib/jquery.js", "./src/avatar.customize.js" ]
+            "js": [ "./lib/jquery.js", "./src/avatar/customize.js" ]
         },
         {
             "matches": [
@@ -99,6 +108,9 @@
             "js": [ "./src/friends.js" ]
         }
     ],
+    "web_accessible_resources": [
+        "/src/rendering/config.json"
+    ],
     "icons": {
         "16":"./icons/PLUS16.png",
         "48":"./icons/PLUS48.png",
@@ -106,7 +118,7 @@
     },
     "permissions": [
         "https://*.brick-hill.com/*",
-        "https://*.bhvalues.com/*",
+        "https://*.brick-hub.com/*",
         "*://brkcdn.com/*"
     ],
     "background": {

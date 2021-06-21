@@ -1,5 +1,5 @@
 const avatarApi = "https://api.brick-hill.com/v1/games/retrieveAvatar?id="
-const bhpApi = "https://bhp.bhvalues.com/v1/item/"
+const bhpApi = "https://bhp.brick-hub.com/v1/item/"
 
 async function getAssetURL(id) {
 
@@ -13,7 +13,7 @@ async function getAssetURL(id) {
     }
 
     const cacheItem = async data => {
-        await fetch("https://bhp.bhvalues.com/v1/item/" + id, {
+        await fetch("https://bhp.brick-hub.com/v1/item/" + id, {
             method: "POST",
             headers: {
                 'Content-Type': 'application/json'
@@ -76,8 +76,7 @@ async function getAssetURL(id) {
                 texture:   null,
                 mesh:      mesh.url,
                 type:      data.type,
-                id:        id,
-                headless: (id === 4859)
+                id:        id
             }
 
             await cacheItem(item)

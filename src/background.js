@@ -1,3 +1,5 @@
+var browser = browser || chrome
+
 async function getAllFriendRequests(page) {
     let api = "https://www.brick-hill.com/friends/"
     let req = await fetch(api + page).catch(() => {
@@ -22,9 +24,8 @@ async function friendsPOSTRequest(data) {
             'Content-Type': 'application/json'
           },
         body: JSON.stringify(data)
-    }).catch(() => {
-        if (req.status === 503)
-            return friendsPOSTRequest(data)
+    }).catch(error => {
+        console.log(error);
     })
 }
 
@@ -41,6 +42,7 @@ browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         }
     
         allRequests.forEach(async user => {
+            setTimeout(() => {}, 1000);
             await friendsPOSTRequest({
                 "_token": request.csrfToken,
                 "userId": user,
@@ -49,3 +51,13 @@ browser.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
         })
     }
 })
+
+// var browser = browser || chrome
+
+// let b = browser.runtime.getURL("src/rendering/config.json")
+
+// ;(async () => {
+//     let data = await fetch(b)
+//     let res = await data.json()
+//     console.log(res);
+// })()

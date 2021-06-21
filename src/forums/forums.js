@@ -2,7 +2,6 @@ const threads = document.getElementsByClassName("thread-row")
 const replies = document.getElementsByClassName("p")
 const userApi = "https://api.brick-hill.com/v1/user/profile?id="
 const youtubeRegex = /((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/
-const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
 const maxPxSize = 600
 
 const allowedEmbedDomains = [
@@ -31,13 +30,13 @@ function getYoutubeID(link) {
 }
 
 
-if (bhpSettings.forumBadges) {
+if (bhpSettings.f_Badges) {
     for (let thread of threads) {
         let innerHTML = thread.childNodes[1].innerHTML
         let match = innerHTML.match(/\/user\/(-?[0-9]+)/)[1]
         let mainDiv = thread.childNodes[1].childNodes[1]
 
-        fetch(`https://bhp.bhvalues.com/v1/user/${match}/badges`)
+        fetch(`https://bhp.brick-hub.com/v1/user/${match}/badges`)
         .then(res => res.json())
         .then(json => {
             if (!json.data.length) {
@@ -76,7 +75,7 @@ if (bhpSettings.forumBadges) {
     }
 }
 
-if (bhpSettings.forumImageEmbeds) {
+if (bhpSettings.f_ImageEmbeds) {
     for (let reply of replies) {
 
         // Make the RegExps global
@@ -100,6 +99,9 @@ if (bhpSettings.forumImageEmbeds) {
                 return el.data.includes(formatMatch[0])
                 //.toLowerCase().
             })
+
+            if (!textElement)
+                continue
 
             let img = document.createElement("img")
             img.style = `max-height:${maxPxSize}px; max-width:100%;`
@@ -146,20 +148,22 @@ if (bhpSettings.forumImageEmbeds) {
     }
 }
 
-const container = document.querySelectorAll("span.light-gray-text")
-for (let i = 0, len = container.length; i < len; i += 2) {
-
-    // Finding the users' join date to calculate total days
-    let date = container[i].innerText.match(/(\d+)\/(\d+)\/(\d+)/)
-    date = new Date(`${date[3]} ${date[2]} ${date[1]}`)
-
-    const days = Math.floor((new Date() - date) / 1000 / 60 / 60 / 24)
-    const posts = parseInt( container[ i + 1 ].innerText.match(/[\d,]+/)[0].replace(/,/g,"") )
-    const text = document.createElement("span")
-
-    text.className = "light-gray-text"
-    text.innerText = (posts/days).toFixed(1) + " posts per day"
-
-    document.querySelectorAll(".col-3-12")[ i / 2 ].appendChild(document.createElement("br"))
-    document.querySelectorAll(".col-3-12")[ i / 2 ].appendChild(text)
+if (bhpSettings.f_PPD) {
+    const container = document.querySelectorAll("span.light-gray-text")
+    for (let i = 0, len = container.length; i < len; i += 2) {
+    
+        // Finding the users' join date to calculate total days
+        let date = container[i].innerText.match(/(\d+)\/(\d+)\/(\d+)/)
+        date = new Date(`${date[3]} ${date[2]} ${date[1]}`)
+    
+        const days = Math.floor((new Date() - date) / 1000 / 60 / 60 / 24)
+        const posts = parseInt( container[ i + 1 ].innerText.match(/[\d,]+/)[0].replace(/,/g,"") )
+        const text = document.createElement("span")
+    
+        text.className = "light-gray-text"
+        text.innerText = (posts/days).toFixed(1) + " posts per day"
+    
+        document.querySelectorAll(".col-3-12")[ i / 2 ].appendChild(document.createElement("br"))
+        document.querySelectorAll(".col-3-12")[ i / 2 ].appendChild(text)
+    }
 }

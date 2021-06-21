@@ -1,5 +1,4 @@
 const forumBody = document.getElementById("body")
-const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
 const lineBreaks = 6
 const imgurRegex = /https:\/\/(i.)?imgur.com(\/a|\/gallery)?\/[0-9a-zA-Z]+(.png|.gif|.jpg|.jpeg)/gi
 const discordRegex = /https:\/\/cdn\.discordapp\.com\/(attachments|emojis)\/[0-9]+(\/[0-9]+\/)?[a-zA-Z0-9\.\-\_\-]+(.png|.gif|.jpg|.jpeg)(\?v=1)?/gi
@@ -30,13 +29,13 @@ function getYoutubeID(link) {
     return "https://www.youtube.com/embed/" + ((match[5] === "watch") ? match[6].match(/\?t=[0-9]+\&v=([a-zA-Z0-9]+)&feature=youtu.be/)[1] : match[5]).toUpperCase()
 }
 
-if (bhpSettings.forumSignature) {
-    forumBody.innerHTML = "\n".repeat(lineBreaks) + bhpSettings.forumSignature.substring(0, 100)
+if (bhpSettings.f_Signature) {
+    forumBody.innerHTML = "\n".repeat(lineBreaks) + bhpSettings.f_Signature.substring(0, 100)
 }
 
 let replies = document.querySelectorAll("blockquote.red")
 
-if (bhpSettings.forumImageEmbeds) {
+if (bhpSettings.f_ImageEmbeds) {
     for (let reply of replies) {
 
         // Make the RegExps global
