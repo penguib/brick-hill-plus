@@ -2,6 +2,7 @@
 
 const token = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const outfitCard = document.querySelector(".outfit-card .content")
+const lockedItems = JSON.parse(document.querySelector("meta[name='locked-items']").getAttribute("content"))
 const loadingMessages = [
     "Shuffling the stuff", 
     "Doing things", 
@@ -54,6 +55,8 @@ document.purge = async function() {
 
         const wearing = JSON.parse(http.responseText)
         wearing.forEach((clothing, i) => {
+            if (lockedItems.includes(clothing.id))
+                return
             setTimeout(()=>{
                 avatarUpdate("remove", clothing.id)
             }, i * 1500)
@@ -64,7 +67,7 @@ document.purge = async function() {
  
 let types = {}
 document.querySelectorAll(".item-types a").forEach(v => {
-    if(v.innerText == "Outfits") return
+    if (v.innerText == "Outfits") return
     types[v.getAttribute("data-url")] = v.innerText
 })
  
@@ -110,7 +113,7 @@ function randomize(modal) {
     modal.querySelector(".modal-content").appendChild(status)
 
     let opts = [...modal.querySelectorAll(".option")].map(v => v.innerText.trim())
-    setTimeout(async ()=>{
+    setTimeout(async () => {
         let inventory = {}
         if (window.localStorage.randomizer_cache && window.localStorage.randomizer_cache_date && Date.now() - window.localStorage.randomizer_cache_date < 1000 * 60 * 60 * 24)
 
@@ -156,7 +159,7 @@ function randomize(modal) {
 
         status.innerText = loadingMessages [Math.floor( Math.random() * loadingMessages.length ) ]
 
-        let outfit = Object.values(inventory).filter(v=>v.length).map(v=>v[Math.floor(Math.random()*v.length)])
+        let outfit = Object.values(inventory).filter(v => v.length).map(v => v[ Math.floor(Math.random() * v.length) ])
         for (let o of outfit) {
             avatarUpdate("wear", o)
             await wait(1000)

@@ -9,6 +9,8 @@ async function renderUser(userId, container, tryOnAsset = null) {
     const OBJLoader = new THREE.OBJLoader();
     const MTLLoader = new THREE.MTLLoader()
 
+    MTLLoader.setMaterialOptions({side: THREE.DoubleSide})
+
     const quickLoad = (mesh, mat) => {
         OBJLoader.load(
             mesh,
@@ -65,12 +67,12 @@ async function renderUser(userId, container, tryOnAsset = null) {
     controls.enablePan = false
     controls.update()
 
-    MTLLoader.load("https://cdn.bhvalues.com/etc/Character.mtl", mats => {
+    MTLLoader.load("https://cdn.brick-hub.com/etc/Character.mtl", mats => {
         mats.preload()
         OBJLoader.setMaterials(mats)
         
         OBJLoader.load(
-            "https://cdn.bhvalues.com/etc/Character.obj",
+            "https://cdn.brick-hub.com/etc/Character.obj",
 
             object => {
                 object.traverse(child => {
@@ -181,7 +183,7 @@ async function renderUser(userId, container, tryOnAsset = null) {
                                         transparent: true,
                                         opacity: 1
                                     })
-                                    child.renderOrder = 3
+                                    child.renderOrder = 1
                                 }
                                 else {
                                     child.material = rArmColor
@@ -278,7 +280,7 @@ async function renderUser(userId, container, tryOnAsset = null) {
                                         map: shirtMat,
                                         transparent: true
                                     })
-                                    child.renderOrder = 3
+                                    child.renderOrder = 1
                                 } else {
                                     child.material = torsoColor
                                     child.renderOrder = 1
@@ -373,7 +375,8 @@ async function renderUser(userId, container, tryOnAsset = null) {
                 let model = OBJLoader.parse(parsed)
                 model.traverse(child => {
                     child.material = new THREE.MeshPhongMaterial({
-                        map: TextureLoader.load(tryOn.texture)
+                        map: TextureLoader.load(tryOn.texture),
+                        side: THREE.Doubleside
                     })
                 })
                 scene.add(model)

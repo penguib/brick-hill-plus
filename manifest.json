@@ -44,7 +44,10 @@
             "matches": [
                 "https://www.brick-hill.com/forum/thread/*"
             ],
-            "js": [ "./src/forums/forums.js" ]
+            "js": [ 
+                "./src/utils/storage.js",
+                "./src/forums/forums.js" 
+            ]
         },
         {
             "matches": [
@@ -95,7 +98,13 @@
             "matches": [
                 "https://www.brick-hill.com/customize/"
             ],
-            "js": [ "./lib/jquery.js", "./src/avatar/customize.js" ]
+            "js": [ 
+                "./lib/jquery.js", 
+                "./src/utils/storage.js",
+                "./src/avatar/lockItems.js",
+                "./src/avatar/customize.js" 
+            ],
+            "run_at": "document_idle"
         },
         {
             "matches": [
@@ -112,7 +121,8 @@
         }
     ],
     "web_accessible_resources": [
-        "/src/rendering/config.json"
+        "/src/rendering/config.json",
+        "/src/avatar/randomizerPurger.js"
     ],
     "icons": {
         "16":"./icons/PLUS16.png",

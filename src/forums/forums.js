@@ -2,7 +2,7 @@ const threads = document.getElementsByClassName("thread-row")
 const replies = document.getElementsByClassName("p")
 const userApi = "https://api.brick-hill.com/v1/user/profile?id="
 const youtubeRegex = /((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/
-const bhpSettings = JSON.parse(window.localStorage.getItem("bhp-settings"))
+const bhpSettings = storage.get("bhp-settings")
 const maxPxSize = 600
 
 const allowedEmbedDomains = [
@@ -31,7 +31,7 @@ function getYoutubeID(link) {
 }
 
 
-if (bhpSettings.forumBadges) {
+if (bhpSettings.f_Badges) {
     for (let thread of threads) {
         let innerHTML = thread.childNodes[1].innerHTML
         let match = innerHTML.match(/\/user\/(-?[0-9]+)/)[1]
@@ -76,7 +76,7 @@ if (bhpSettings.forumBadges) {
     }
 }
 
-if (bhpSettings.forumImageEmbeds) {
+if (bhpSettings.f_ImageEmbeds) {
     for (let reply of replies) {
 
         // Make the RegExps global

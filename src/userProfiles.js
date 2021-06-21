@@ -2,7 +2,7 @@ const url = window.location.href
 const userId = url.match(/-?[0-9]+/)[0]
 const api = "https://api.brick-hill.com/v1/games/retrieveAvatar?id="
 const hatApi = "https://api.brick-hill.com/v1/shop/"
-const userApi = "https://api.bhvalues.com/v1/user/"
+const userApi = "https://api.brick-hub.com/v1/user/"
 
 // Creatubg each element with creatElement to prevent XSS
 // Thanks to Dragonian 
@@ -113,12 +113,12 @@ async function generateUserInfo() {
         const aCAdd = document.createElement("a")
         aCAdd.style = "color: cornflowerblue"
         aCAdd.innerText = "Click here "
-        aCAdd.href = "https://www.bhvalues.com/user/" + userId
+        aCAdd.href = "https://trade.brick-hub.com/user/" + userId
         contentDiv.appendChild(aCAdd)
 
         const aAdd = document.createElement("a")
         aAdd.innerText = "to add them!"
-        aCAdd.href = "https://www.bhvalues.com/user/" + userId
+        aCAdd.href = "https://trade.brick-hub.com/user/" + userId
         contentDiv.appendChild(aAdd)
 
     } else {
@@ -152,12 +152,12 @@ async function generateUserInfo() {
         }
     
         const aDetails = document.createElement("a")
-        aDetails.href = "https://www.bhvalues.com/user/" + userId
+        aDetails.href = "https://trade.brick-hub.com/user/" + userId
         aDetails.innerText = "View more with "
         contentDiv.appendChild(aDetails)
     
         const aBHV = document.createElement("a")
-        aBHV.href = "https://www.bhvalues.com/user/" + userId
+        aBHV.href = "https://trade.brick-hub.com/user/" + userId
         aBHV.style = "color: cornflowerblue"
         aBHV.innerText = "Brick Hill Values"
         contentDiv.appendChild(aBHV)

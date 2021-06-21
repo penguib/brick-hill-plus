@@ -40,6 +40,12 @@ const storageKeys = {
     "s_I3D": {
         default: true,
         null: false
+    },
+
+    //Avatar settnigs
+    "a_Locked": {
+        default: [],
+        null: []
     }
 } 
 
@@ -56,6 +62,17 @@ const storage = {
     set: (key, val) => {
         const compressed = LZString.compress( JSON.stringify(val) )
         window.localStorage.setItem(key, compressed)
+    },
+
+    addProp: (key, val) => {
+        const data = storage.get(key)
+        if (!data)
+            return null
+        let newData = {
+            ...data,
+            ...val
+        }
+        storage.set(key, newData)
     },
 
     // Checks to see if the settings includes all the properties
