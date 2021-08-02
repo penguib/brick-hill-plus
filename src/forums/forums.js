@@ -2,7 +2,6 @@ const threads = document.getElementsByClassName("thread-row")
 const replies = document.getElementsByClassName("p")
 const userApi = "https://api.brick-hill.com/v1/user/profile?id="
 const youtubeRegex = /((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/
-const bhpSettings = storage.get("bhp-settings")
 const maxPxSize = 600
 
 const allowedEmbedDomains = [
@@ -30,48 +29,25 @@ function getYoutubeID(link) {
     return "https://www.youtube.com/embed/" + ((match[5] === "watch") ? match[6].match(/\?t=[0-9]+\&v=([a-zA-Z0-9]+)&feature=youtu.be/)[1] : match[5])
 }
 
-
 if (bhpSettings.f_Badges) {
     for (let thread of threads) {
         let innerHTML = thread.childNodes[1].innerHTML
         let match = innerHTML.match(/\/user\/(-?[0-9]+)/)[1]
         let mainDiv = thread.childNodes[1].childNodes[1]
 
-        fetch(`https://bhp.bhvalues.com/v1/user/${match}/badges`)
+        fetch(userApi + match)
         .then(res => res.json())
-        .then(json => {
-            if (!json.data.length) {
-                
-                fetch(userApi + match)
-                .then(res => res.json())
-                .then(async data => {
-                    let awards = data.awards
-                    let isAdmin = awards.find(award => award.award_id === 3)
+        .then(async data => {
+            let awards = data.awards
+            let isAdmin = awards.find(award => award.award_id === 3)
 
-                    // Add a break for non-admins so that the awards are under their post count
-                    let s = (isAdmin) ? "" : "<br>"
+            // Add a break for non-admins so that the awards are under their post count
+            let s = (isAdmin) ? "" : "<br>"
 
-                    for (let award of awards) {
-                        s += `<img src="https://www.brick-hill.com/images/awards/${award.award_id}.png" style="width:40px">`
-                    }
-                    mainDiv.innerHTML += s
-                })
-
-            } else {
-
-                let awards = json.data
-                if (awards.length) {
-                    let isAdmin = awards.find(award => award === 3)
-    
-                    // Add a break for non-admins so that the awards are under their post count
-                    let s = (isAdmin) ? "" : "<br>"
-        
-                    for (let award of awards) {
-                        s += `<img src="https://www.brick-hill.com/images/awards/${award}.png" style="width:40px">`
-                    }
-                    mainDiv.innerHTML += s
-                }
+            for (let award of awards) {
+                s += `<img src="https://www.brick-hill.com/images/awards/${award.award_id}.png" style="width:40px">`
             }
+            mainDiv.innerHTML += s
         })
     }
 }
@@ -100,6 +76,9 @@ if (bhpSettings.f_ImageEmbeds) {
                 return el.data.includes(formatMatch[0])
                 //.toLowerCase().
             })
+
+            if (!textElement)
+                continue
 
             let img = document.createElement("img")
             img.style = `max-height:${maxPxSize}px; max-width:100%;`
@@ -146,20 +125,22 @@ if (bhpSettings.f_ImageEmbeds) {
     }
 }
 
-const container = document.querySelectorAll("span.light-gray-text")
-for (let i = 0, len = container.length; i < len; i += 2) {
-
-    // Finding the users' join date to calculate total days
-    let date = container[i].innerText.match(/(\d+)\/(\d+)\/(\d+)/)
-    date = new Date(`${date[3]} ${date[2]} ${date[1]}`)
-
-    const days = Math.floor((new Date() - date) / 1000 / 60 / 60 / 24)
-    const posts = parseInt( container[ i + 1 ].innerText.match(/[\d,]+/)[0].replace(/,/g,"") )
-    const text = document.createElement("span")
-
-    text.className = "light-gray-text"
-    text.innerText = (posts/days).toFixed(1) + " posts per day"
-
-    document.querySelectorAll(".col-3-12")[ i / 2 ].appendChild(document.createElement("br"))
-    document.querySelectorAll(".col-3-12")[ i / 2 ].appendChild(text)
+if (bhpSettings.f_PPD) {
+    const container = document.querySelectorAll("span.light-gray-text")
+    for (let i = 0, len = container.length; i < len; i += 2) {
+    
+        // Finding the users' join date to calculate total days
+        let date = container[i].innerText.match(/(\d+)\/(\d+)\/(\d+)/)
+        date = new Date(`${date[3]} ${date[2]} ${date[1]}`)
+    
+        const days = Math.floor((new Date() - date) / 1000 / 60 / 60 / 24)
+        const posts = parseInt( container[ i + 1 ].innerText.match(/[\d,]+/)[0].replace(/,/g,"") )
+        const text = document.createElement("span")
+    
+        text.className = "light-gray-text"
+        text.innerText = (posts/days).toFixed(1) + " posts per day"
+    
+        document.querySelectorAll(".col-3-12")[ i / 2 ].appendChild(document.createElement("br"))
+        document.querySelectorAll(".col-3-12")[ i / 2 ].appendChild(text)
+    }
 }

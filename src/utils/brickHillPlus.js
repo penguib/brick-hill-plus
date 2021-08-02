@@ -1,3 +1,6 @@
+
+// Need a fallback when the data fails
+
 function getBHPData(callback) {
 	fetch(`https://api.brick-hub.com/v1/item/${itemID}`)
 	.then(res => res.json())

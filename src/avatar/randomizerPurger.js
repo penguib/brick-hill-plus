@@ -1,5 +1,4 @@
 // Thanks to Noah Cool Boy for providing this script
-
 const token = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const outfitCard = document.querySelector(".outfit-card .content")
 const lockedItems = JSON.parse(document.querySelector("meta[name='locked-items']").getAttribute("content"))

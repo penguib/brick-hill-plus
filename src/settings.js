@@ -1,5 +1,3 @@
-const bhpSettings = storage.get("bhp-settings")
-const parsedSettings = bhpSettings ||  {}
 const $ = e => { return document.getElementById(e) }
 const bhplusSettingsColumn = document.createElement("div")
 const settingsMainDiv = document.getElementsByClassName("main-holder grid")[0]
@@ -12,26 +10,24 @@ bhplusSettingsCard.className = "card"
 
 
 // this is so that we can check the checkboxes that they saved
-function booleanToChecked(value) {
-    if (value)
-        return "checked"
-    return ""
+const booleanToChecked = value => {
+    return (value) ? "checked" : ""
 }
 
 // same as above, but instead of "checked" it's "selected"
-function conversionToSelected(value) {
-    if (value === Number(parsedSettings.shopConversions))
-        return "selected"
-    return ""
-} 
 
-const forumImageEmbeds = (parsedSettings.f_ImageEmbeds !== undefined) ? booleanToChecked(parsedSettings.f_ImageEmbeds) : "checked"
-const forumBadges      = (parsedSettings.f_Badges !== undefined)      ? booleanToChecked(parsedSettings.f_Badges)      : "checked"
-const forumPPD         = (parsedSettings.f_PPD !== undefined)         ? booleanToChecked(parsedSettings.f_PPD)         : "checked"
-const forumSignature   = (parsedSettings.f_Signature !== undefined)   ? parsedSettings.f_Signature                     : ""
+const conversionToSelected = value => {
+    return (value === Number(bhpSettings.shopConversions)) ? "selected" : ""
+}
 
-const messagesImageEmbeds = (parsedSettings.messagesImageEmbeds !== undefined) ? booleanToChecked(parsedSettings.messagesImageEmbeds) : "checked"
+const forumImageEmbeds = (bhpSettings.f_ImageEmbeds !== undefined) ? booleanToChecked(bhpSettings.f_ImageEmbeds) : "checked"
+const forumBadges      = (bhpSettings.f_Badges !== undefined)      ? booleanToChecked(bhpSettings.f_Badges)      : "checked"
+const forumPPD         = (bhpSettings.f_PPD !== undefined)         ? booleanToChecked(bhpSettings.f_PPD)         : "checked"
+const forumSignature   = (bhpSettings.f_Signature !== undefined)   ? bhpSettings.f_Signature                     : ""
 
+const messagesImageEmbeds = (bhpSettings.m_ImageEmbeds !== undefined) ? booleanToChecked(bhpSettings.m_ImageEmbeds) : "checked"
+
+const navbarButton  = (bhpSettings.n_CustomButton.name !== "") ? bhpSettings.n_CustomButton : { name: "", link: "" }
 
 bhplusSettingsCard.innerHTML = `
                 <div id="bhp-success" class="alert success" style="display:none">Brick Hill+ settings have been saved</div>
@@ -81,6 +77,7 @@ bhplusSettingsCard.innerHTML = `
                     <span class="dark-gray-text" style="padding-bottom: 5px;">Custom Button</span>
                     <input id="bhp-CBName" class="block" maxlength="20" placeholder="Button name" style="margin-bottom: 6px;" type="text"></input>
                     <input id="bhp-CBLink" class="block" placeholder="Button link" style="margin-bottom: 6px;" type="text"></input>
+                    <br>
                     <button id="bhp-save" class="button small blue">Save</button>
                     <br>
                 </div>
@@ -92,17 +89,27 @@ bhplusSettingsColumn.appendChild(bhplusSettingsCard)
 // appending the text after the element is in the DOM to prevent XSS
 // thanks to Dragonian
 $("bhp-forumSignature").value = forumSignature
+$("bhp-CBName").value = navbarButton.name
+$("bhp-CBLink").value = navbarButton.link
+
 
 document.getElementById("bhp-save").addEventListener("click", () => {
 
     storage.set("bhp-settings", {
         f_ImageEmbeds: $("bhp-forumImageEmbeds").checked,
-        f_Badges: $("bhp-forumBadges").checked,
-        f_Signature: $("bhp-forumSignature").value,
+        f_Badges:      $("bhp-forumBadges").checked,
+        f_Signature:   $("bhp-forumSignature").value,
+        f_PPD:         $("bhp-forumPPD").checked,
 
         m_ImageEmbeds: $("bhp-messagesImageEmbeds").checked,
 
-        s_Conversions: $("bhp-shopConversions").value
+        s_Conversions: $("bhp-shopConversions").value,
+
+        n_CustomButton: {
+            name: $("bhp-CBName").value,
+            link: $("bhp-CBLink").value
+        }
+
     })
 
     $("bhp-success").style = ""

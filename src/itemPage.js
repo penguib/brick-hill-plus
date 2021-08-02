@@ -1,4 +1,3 @@
-const bhpSettings = storage.get("bhp-settings")
 const bucksConversion = bhpSettings.shopConversions || 0.01
 const allowedItemTypes = [ "Hat", "Head", "Tool", "Face" ]
 const allowed3DItemTypes = [ "Hat", "Tool" ]
@@ -50,6 +49,39 @@ $(document).ready(async() => {
 		tryOnBtt.classList = "button medium green f-left"
 		tryOnBtt.style = "position: relative; left: -45px; top: 7px"
 		tryOnBtt.innerText = "Try On"
+		
+		// If the user is logged out
+		if (!userID)
+			$(tryOnBtt).hide()
+
+		const loadingContainer = document.createElement("div")
+	
+		// //let containerHeight = ($(itemBox).hasClass("special") || $(itemBox).hasClass("owns")) ? "271px" : "279px"
+
+		$(loadingContainer).css("height", window.getComputedStyle(document.getElementById("item-img")).height)
+		$(loadingContainer).hide()
+		const loadingGif = document.createElement("div")
+		loadingGif.classList = "loader"
+		loadingContainer.appendChild(loadingGif)
+	
+		itemBox.insertBefore(loadingContainer, itemImage)
+
+		const toggleButtons = (element, color, text) => {
+			const btt = $(element)
+			btt.text(text)
+			switch (color) {
+				case "red": {
+					btt.removeClass("green")
+					btt.addClass("red")
+					break
+				}
+				case "green": {
+					btt.removeClass("red")
+					btt.addClass("green")
+					break
+				}
+			}
+		}
 	
 		if (allowed3DItemTypes.includes(itemType)) {
 			itemBox.insertBefore(view3D, itemBoxChildren[itemBoxChildren.length - 1])
@@ -76,11 +108,11 @@ $(document).ready(async() => {
 						
 					$(loadedItem.renderer.domElement).show()
 					
-					view3D.innerText = "2D"
-					
+					toggleButtons(view3D, "red", "2D")
+
 					itemImg.hide()
 					avatarViewer.hide()
-					toggleTryOn("green")
+					toggleButtons(tryOnBtt, "green", "Try on")
 	
 					const pos = quad => { return {
 						"top": "-43px",
@@ -97,7 +129,8 @@ $(document).ready(async() => {
 					return
 				}
 	
-				view3D.innerText = "3D"
+				toggleButtons(view3D, "green", "3D")
+
 				loadedItem.renderer.domElement.style.display = "none"
 	
 				const pos = quad => { return {
@@ -108,7 +141,7 @@ $(document).ready(async() => {
 				$(loadedItem.renderer.domElement).hide()
 				avatarViewer.hide()
 				itemImg.show()
-				toggleTryOn("green")
+				toggleButtons(tryOnBtt, "green", "Try on")
 	
 				$(itemContainer).css("height", "")
 				$(view3D).css( pos("right") )
@@ -136,37 +169,6 @@ $(document).ready(async() => {
 			ul.appendChild(li)
 		else
 			ul.insertBefore(li, ul.children[0])
-
-		// const loadingContainer = document.createElement("div")
-	
-		// //let containerHeight = ($(itemBox).hasClass("special") || $(itemBox).hasClass("owns")) ? "271px" : "279px"
-
-		// // $(loadingContainer).css("height", window.getComputedStyle(document.getElementById("item-img")).height)
-		// $(loadingContainer).hide()
-		const loadingContainer = document.createElement("div")
-		loadingContainer.classList = "loader"
-		$(loadingContainer).hide()
-		//loadingContainer.appendChild(loadingGif)
-	
-		itemBox.insertBefore(loadingContainer, itemImage)
-
-		const toggleTryOn = color => {
-			const btt = $(tryOnBtt)
-			switch (color) {
-				case "red": {
-					btt.removeClass("green")
-					btt.addClass("red")
-					btt.text("Take Off")
-					break
-				}
-				case "green": {
-					btt.removeClass("red")
-					btt.addClass("green")
-					btt.text("Try On")
-					break
-				}
-			}
-		}
 	
 		const itemData = await getAssetURL(itemID)
 
@@ -219,7 +221,8 @@ $(document).ready(async() => {
 				loadedUser.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
 
 				$(loadedUser.renderer.domElement).show()
-				toggleTryOn("red")
+				toggleButtons(tryOnBtt, "red", "Take off")
+				toggleButtons(view3D, "green", "3D")
 	
 				const pos = quad => { return {
 					"top": "-43px",
@@ -240,7 +243,8 @@ $(document).ready(async() => {
 			}
 	
 			$(itemContainer).css("height", comp.height)
-				toggleTryOn("green")
+				toggleButtons(tryOnBtt, "green", "Try on")
+				toggleButtons(view3D, "green", "3D")
 	
 				const pos = quad => { return {
 					"top": "7px",
@@ -369,10 +373,4 @@ $(document).ready(async() => {
 	}
 
 	
-	let statsDiv = document.getElementsByClassName("small-text mt6 mb2")[0]
-	let bhpData = getBHPlusData()
-	
-	statsDiv.appendChild(bhpData[1])
-	statsDiv.appendChild(bhpData[0])
 })
-

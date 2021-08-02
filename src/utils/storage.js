@@ -21,7 +21,6 @@ const storageKeys = {
         null: false
     },
 
-
     // Message settings
     "m_ImageEmbeds": {
         default: true,
@@ -42,10 +41,16 @@ const storageKeys = {
         null: false
     },
 
-    //Avatar settnigs
-    "a_Locked": {
-        default: [],
-        null: []
+    // Navbar settings
+    "n_CustomButton": {
+        default: {
+            name: "",
+            link: ""
+        },
+        null: {
+            name: "",
+            link: ""    
+        }
     }
 } 
 
@@ -81,8 +86,11 @@ const storage = {
         const data = storage.get(key)
         if (!data)
             return false
-        const props = Object.keys(data)
-        return props.every(prop => Object.keys(storageKeys).includes(prop))
+
+        const currentProps = Object.keys(data)
+        const neededProps  = Object.keys(storageKeys)
+
+        return neededProps.every(prop => currentProps.includes(prop)) && currentProps.every(prop => neededProps.includes(prop))
     },
 
     fillProps: (key, nulled = false) => {
@@ -111,9 +119,16 @@ const storage = {
                 continue
             data[prop] = storageKeys[prop].default
         }
+
+        // Remove any keys that aren't supposed to be there
+        let badKeys = keys.filter(k => !Object.keys(storageKeys).includes(k))
+        for (let badKey of badKeys)
+            delete data[badKey]
+
+        return storage.set(key, data)
     },
 
     nullProps: key => {
-        fillProps(key)
+        fillProps(key, true)
     }
 }

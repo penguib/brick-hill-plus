@@ -9,3 +9,6 @@ lib/
 
 # css files
 styles/
+
+# static files
+static/

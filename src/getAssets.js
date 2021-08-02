@@ -1,28 +1,6 @@
 const avatarApi = "https://api.brick-hill.com/v1/games/retrieveAvatar?id="
-const bhpApi = "https://bhp.brick-hub.com/v1/item/"
-const defaultFace = [  ]
 
 async function getAssetURL(id) {
-
-    const r = await fetch(bhpApi + id)
-    const json = await r.json()
-    let data = json.data
-
-    if (data.type && (data.mesh || data.texture)) {
-        data['id'] = id
-        return data
-    }
-
-    const cacheItem = async data => {
-        await fetch("https://bhp.brick-hub.com/v1/item/" + id, {
-            method: "POST",
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(data)
-        })
-    }
-    
 
     const polyApi = "https://api.brick-hill.com/v1/assets/getPoly/1/"
     const assetApi = "https://api.brick-hill.com/v1/assets/get/"
@@ -48,8 +26,6 @@ async function getAssetURL(id) {
                 id:      id,
             }
 
-            await cacheItem(item)
-
             return item
         }
         case "tool": {
@@ -65,8 +41,6 @@ async function getAssetURL(id) {
                 id:      id,
             }
 
-            await cacheItem(item)
-
             return item
         }
         case "head": {
@@ -80,7 +54,6 @@ async function getAssetURL(id) {
                 id:        id
             }
 
-            await cacheItem(item)
 
             return item
         }
@@ -96,8 +69,6 @@ async function getAssetURL(id) {
                 type:    data.type,
                 id:      id,
             }
-
-            cacheItem(item)
 
             return item
         }

@@ -26,12 +26,12 @@ DeclineAllButton.className = "mb2 red"
 DeclineAllButton.innerText = "Decline All"
 DeclineAllItem.appendChild(DeclineAllButton)
 
-friendsCard.insertBefore(friendsButtonContent, friendsContent)
+// friendsCard.insertBefore(friendsButtonContent, friendsContent)
 
 const successBanner = document.createElement("div")
 successBanner.className = "alert success"
 successBanner.style = "display:none"
-friendsCard.insertBefore(successBanner, friendsCard.childNodes[0])
+// friendsCard.insertBefore(successBanner, friendsCard.childNodes[0])
 
 var browser = browser || chrome
 

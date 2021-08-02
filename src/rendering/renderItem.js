@@ -4,7 +4,6 @@ async function renderItem(itemID, container) {
 
     const itemData = await getAssetURL(itemID)
     const TextureLoader = new THREE.TextureLoader();
-    const OBJLoader = new THREE.OBJLoader();
 
     const box3D = new THREE.Box3()
 	const OBJloader = new THREE.OBJLoader();

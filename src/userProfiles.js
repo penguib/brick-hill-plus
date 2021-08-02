@@ -81,90 +81,6 @@ async function getUserData() {
     return res.json()
 }
 
-async function generateUserInfo() {
-    const mainDiv = document.createElement("div")
-    mainDiv.className = "card"
-
-    const topDiv = document.createElement("div")
-    topDiv.className = "top red"
-    topDiv.innerText = "User Info"
-    mainDiv.appendChild(topDiv)
-
-    const contentDiv = document.createElement("div")
-    contentDiv.className = "content"
-    contentDiv.style = "text-align: center"
-    mainDiv.appendChild(contentDiv)
-
-    const container = document.createElement("div")
-    container.style = "display: flex; flex-wrap: wrap; justify-content: center; gap: 10px"
-    contentDiv.appendChild(container)
-
-    const userData = await getUserData()
-    
-    if (userData.err) {
-        const sErr = document.createElement("span")
-        sErr.innerText = "User is not in Brick Hill Value's database"
-        contentDiv.appendChild(sErr)
-
-        for (let i = 0; i < 2; i++) {
-            contentDiv.appendChild(document.createElement("br"))
-        }
-
-        const aCAdd = document.createElement("a")
-        aCAdd.style = "color: cornflowerblue"
-        aCAdd.innerText = "Click here "
-        aCAdd.href = "https://trade.brick-hub.com/user/" + userId
-        contentDiv.appendChild(aCAdd)
-
-        const aAdd = document.createElement("a")
-        aAdd.innerText = "to add them!"
-        aCAdd.href = "https://trade.brick-hub.com/user/" + userId
-        contentDiv.appendChild(aAdd)
-
-    } else {
-        const dValue = document.createElement("button")
-        dValue.className = "button green flat no-cap"
-        dValue.innerHTML = `Value: <span class="bucks-icon img-white"></span> ${userData.value.toLocaleString()}`
-        container.appendChild(dValue)
-    
-        const dAverage = document.createElement("button")
-        dAverage.className = "button orange flat no-cap"
-        dAverage.innerHTML = `Averrage: <span class="bucks-icon img-white"></span> ${userData.average.toLocaleString()}`
-        container.appendChild(dAverage)
-    
-        const dRank = document.createElement("button")
-        dRank.className = "button blue flat no-cap"
-        dRank.innerText = `Rank: #${userData.rank.toLocaleString()}`
-        container.appendChild(dRank)
-    
-        const dSpecials = document.createElement("button")
-        dSpecials.className = "button red flat no-cap"
-        dSpecials.innerText = `Specials: ${userData.items.specials.toLocaleString()}`
-        container.appendChild(dSpecials)
-    
-        const dHoards = document.createElement("button")
-        dHoards.className = "button blue flat no-cap"
-        dHoards.innerText = `Hoards: ${userData.items.hoards.toLocaleString()}`
-        container.appendChild(dHoards)
-    
-        for (let i = 0; i < 2; i++) {
-            contentDiv.appendChild(document.createElement("br"))
-        }
-    
-        const aDetails = document.createElement("a")
-        aDetails.href = "https://trade.brick-hub.com/user/" + userId
-        aDetails.innerText = "View more with "
-        contentDiv.appendChild(aDetails)
-    
-        const aBHV = document.createElement("a")
-        aBHV.href = "https://trade.brick-hub.com/user/" + userId
-        aBHV.style = "color: cornflowerblue"
-        aBHV.innerText = "Brick Hill Values"
-        contentDiv.appendChild(aBHV)
-    }
-
-    return mainDiv
-}
 const userContainer = document.querySelector("div.content.text-center.bold.medium-text.relative.ellipsis")
 $(userContainer).css("outline", "none")
 const view3D = document.createElement("button")
@@ -194,14 +110,10 @@ if (userId && !window.location.href.includes("friends")) {
     fetch(api + userId)
     .then(res => res.json())
     .then(data => {
+        console.log(data)
         let mainDiv = document.getElementsByClassName("col-6-12")
-        var second_div = mainDiv[0].getElementsByClassName('card')[0]
         let card = document.createElement("div")
         card.className = "card"
-
-        generateUserInfo().then(div => {
-            mainDiv[0].insertBefore(div, second_div.nextSibling)
-        })
 
         // Wait for the HTML then append the clothing to the DOM
         appendItems(data.items).then(html => {

@@ -1,5 +1,8 @@
 var browser = browser || chrome
 
+const characterMat = browser.runtime.getURL("static/Character.mtl")
+const characterModel = browser.runtime.getURL("static/Character.obj")
+
 async function renderUser(userId, container, tryOnAsset = null) {
 
     if (!userId)
@@ -67,12 +70,12 @@ async function renderUser(userId, container, tryOnAsset = null) {
     controls.enablePan = false
     controls.update()
 
-    MTLLoader.load("https://cdn.brick-hub.com/etc/Character.mtl", mats => {
+    MTLLoader.load(characterMat, mats => {
         mats.preload()
         OBJLoader.setMaterials(mats)
         
         OBJLoader.load(
-            "https://cdn.brick-hub.com/etc/Character.obj",
+            characterModel,
 
             object => {
                 object.traverse(child => {
@@ -256,7 +259,7 @@ async function renderUser(userId, container, tryOnAsset = null) {
                                             map: pantsMat,
                                             transparent: true
                                         })
-                                        pants.renderOrder = 2
+                                        pants.renderOrder = 1
                                         scene.add(pants)
 
                                         // Problem with transpareny with shirt + pants + tshirt
@@ -264,7 +267,7 @@ async function renderUser(userId, container, tryOnAsset = null) {
                                             map: shirtMat,
                                             transparent: true
                                         })
-                                        child.renderOrder = 3
+                                        child.renderOrder = 2
 
                                     } else {
                                         child.material = new THREE.MeshPhongMaterial({
@@ -280,7 +283,7 @@ async function renderUser(userId, container, tryOnAsset = null) {
                                         map: shirtMat,
                                         transparent: true
                                     })
-                                    child.renderOrder = 1
+                                    child.renderOrder = 2
                                 } else {
                                     child.material = torsoColor
                                     child.renderOrder = 1
@@ -386,11 +389,11 @@ async function renderUser(userId, container, tryOnAsset = null) {
 
         if (userAssets.hats.length === 5) {
             for (let i = 0, len = userAssets.hats.length - 1; i < len; ++i) {
-                parseOBJ(hat.mesh, parsed => {
+                parseOBJ(userAssets.hats[i].mesh, parsed => {
                     let model = OBJLoader.parse(parsed)
                     model.traverse(child => {
                         child.material = new THREE.MeshPhongMaterial({
-                            map: TextureLoader.load(hat.texture),
+                            map: TextureLoader.load(userAssets.hats[i].texture),
                             side: THREE.DoubleSide
                         })
                     })
