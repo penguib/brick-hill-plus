@@ -6,8 +6,11 @@ async function getAssetURL(id) {
     const assetApi = "https://api.brick-hill.com/v1/assets/get/"
 
     const res = await fetch(polyApi + id, {
+        method: "GET",
+        credentials: "omit",
+        redirect: "follow",
         headers: {
-            "Access-Control-Allow-Origin": "*"
+            'Access-Control-Allow-Origin':'*'
         }
     })
     data = await res.json()

@@ -1,14 +1,5 @@
-# lib files
-lib/
-
 # zip files
 *.zip
 
 # txt files
 *.txt
-
-# css files
-styles/
-
-# static files
-static/
