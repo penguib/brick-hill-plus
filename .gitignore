@@ -1,5 +1,3 @@
-# zip files
 *.zip
-
-# txt files
 *.txt
+lib/.DS_Store
