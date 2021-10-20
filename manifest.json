@@ -22,6 +22,7 @@
                 "https://www.brick-hill.com/user/*"
             ],
             "js": [ 
+                "./lib/imageMerger.js",
                 "./src/getAssets.js",
                 "./src/rendering/getConfig.js",
                 "./src/rendering/renderAvatar.js", 
@@ -30,7 +31,7 @@
                 "./lib/OBJLoader.js", 
                 "./lib/OrbitControls.js", 
                 "./lib/MTLLoader.js", 
-                "./src/userProfiles.js" 
+                "./src/userProfiles.js"
             ]
         },
         {
@@ -78,6 +79,7 @@
                 "https://www.brick-hill.com/shop/*"
             ],
             "js": [ 
+                "./lib/imageMerger.js",
                 "./src/utils/brickHillPlus.js",
                 "./src/rendering/getConfig.js",
                 "./src/rendering/renderAvatar.js",
@@ -128,9 +130,8 @@
         "128":"./icons/PLUS.png"
     },
     "permissions": [
-        "https://*.brick-hill.com/*",
-        "*://*.brick-hub.com/*",
-        "*://brkcdn.com/*"
+        "*://brkcdn.com/*",
+        "https://*.brick-hill.com/*"
     ],
     "background": {
         "scripts": [ "./src/background.js" ]

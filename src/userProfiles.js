@@ -90,6 +90,70 @@ $(view3D).css({
     "position": "relative",
 })
 view3D.innerText = "3D"
+let loaded3D = false
+
+    const imgs = $(userContainer).find('img')
+    const userThumbnail = imgs.toArray().find(i => i.src.includes("brkcdn"))
+
+    const loadingContainer = document.createElement('div')
+    $(loadingContainer).css("height", "327px")
+    $(loadingContainer).hide()
+    const loadingGif = document.createElement('div')
+    loadingGif.classList = "loader"
+    loadingContainer.appendChild(loadingGif)
+
+    userContainer.insertBefore(loadingContainer, userThumbnail)
+$(view3D).click(async () => {
+    console.log("clicked");
+    const btt  = $(view3D)
+    const text = btt.text()
+    const cameraPosition = new THREE.Vector3(-2.9850597402271473, 5.024487076222519, 4.542919202987628)
+
+    if (text.includes("3D")) {
+
+        if (!loaded3D) {
+            $(userThumbnail).hide()
+            $(loadingContainer).show()
+            loaded3D = await renderUser(userId, userContainer)
+            $(loadingContainer).hide()
+
+            const canvas = loaded3D.renderer
+            const camera = loaded3D.camera
+
+            canvas.setSize( 325, 327 );
+            $(canvas.domElement).css({
+                "margin-right": "auto",
+                "margin-left": "auto"
+            })
+
+            userContainer.insertBefore(canvas.domElement, $(userThumbnail).next()[0])
+            camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+
+        } else {
+            loaded3D.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+            $(loaded3D.renderer.domElement).show()
+        }
+
+        btt.text("2D")
+        btt.removeClass("green")
+        btt.addClass("blue")
+
+        $(userThumbnail).hide()
+
+        return
+    }
+
+
+    $(loaded3D.renderer.domElement).hide()
+
+    btt.text("3D")
+    btt.removeClass("blue")
+    btt.addClass("green")
+
+    $(userThumbnail).show()
+
+    return
+})
 
 const userDescription = document.querySelector("div.user-description-box")
 
@@ -135,18 +199,6 @@ $(document).ready(async () => {
     a.innerText = "Copy Avatar URL"
     li.appendChild(a)
 
-    const imgs = $(userContainer).find('img')
-    const userThumbnail = imgs.toArray().find(i => i.src.includes("brkcdn"))
-
-    const loadingContainer = document.createElement('div')
-    $(loadingContainer).css("height", "327px")
-    $(loadingContainer).hide()
-    const loadingGif = document.createElement('div')
-    loadingGif.classList = "loader"
-    loadingContainer.appendChild(loadingGif)
-
-    userContainer.insertBefore(loadingContainer, userThumbnail)
-
     $(li).click(() => {
         navigator.clipboard.writeText(userThumbnail.src)
         setTimeout(() => {
@@ -162,57 +214,6 @@ $(document).ready(async () => {
     else
         ul.insertBefore(li, ul.children[0])
 
-    let loaded3D = false
-    $(view3D).click(async () => {
-        const btt  = $(view3D)
-        const text = btt.text()
-        const cameraPosition = new THREE.Vector3(-2.9850597402271473, 5.024487076222519, 4.542919202987628)
-
-        if (text.includes("3D")) {
-
-            if (!loaded3D) {
-                $(userThumbnail).hide()
-                $(loadingContainer).show()
-                loaded3D = await renderUser(userId, userContainer)
-                $(loadingContainer).hide()
-
-                const canvas = loaded3D.renderer
-                const camera = loaded3D.camera
-
-                canvas.setSize( 325, 327 );
-                $(canvas.domElement).css({
-                    "margin-right": "auto",
-                    "margin-left": "auto"
-                })
-
-                userContainer.insertBefore(canvas.domElement, $(userThumbnail).next()[0])
-                camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
-
-            } else {
-                loaded3D.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
-                $(loaded3D.renderer.domElement).show()
-            }
-
-            btt.text("2D")
-            btt.removeClass("green")
-            btt.addClass("blue")
-
-            $(userThumbnail).hide()
-
-            return
-        }
-
-
-        $(loaded3D.renderer.domElement).hide()
-
-        btt.text("3D")
-        btt.removeClass("blue")
-        btt.addClass("green")
-
-        $(userThumbnail).show()
-
-        return
-    })
 
     if (document.querySelectorAll(".stats-table")) {
 

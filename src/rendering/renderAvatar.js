@@ -1,7 +1,33 @@
 var browser = browser || chrome
 
+// spamming 3d or try on will create multiple canvases
+
 const characterMat = browser.runtime.getURL("static/Character.mtl")
 const characterModel = browser.runtime.getURL("static/Character.obj")
+
+function loadImage(path) {
+    var canvas = document.createElement('canvas');
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    //document.body.appendChild(canvas);
+
+    var texture = new THREE.Texture(canvas);
+
+    var img = new Image();
+    img.crossOrigin = '' 
+    img.onload = function() {
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        var context = canvas.getContext('2d');
+        context.drawImage(img, 0, 0);
+
+        texture.needsUpdate = true;
+    };
+    img.src = path;
+    return texture;
+};
 
 async function renderUser(userId, container, tryOnAsset = null) {
 
@@ -28,9 +54,7 @@ async function renderUser(userId, container, tryOnAsset = null) {
     }
 
     const userAssets = await getUserAssets(userId)
-    let tryOn
-    if (tryOnAsset)
-        tryOn = await getAssetURL(tryOnAsset)
+    let tryOn = (tryOnAsset) ? await getAssetURL(tryOnAsset) : null
 
     const box3D = new THREE.Box3()
     const config = await getConfig()
@@ -79,43 +103,58 @@ async function renderUser(userId, container, tryOnAsset = null) {
 
             object => {
                 object.traverse(child => {
+                    console.log(child.name);
                     if (child instanceof THREE.Mesh) {
                         switch (child.name) {
                             case "Head_Head_Head_Circle.000": {
-
-                                // If they are wearing headless
-                                const headID = userAssets.head?.id || tryOn?.id
-                                if (Number(headID) === 4859) {
-                                    child.visible = false
-                                    break
-                                }
+                                
                                 const faceData = userAssets.face
                                 const faceMat = (tryOn?.type === "face") ? tryOn.texture : ((faceData) ? faceData.texture : "http://brkcdn.com/assets/default/face.png")
                                 const existsHead = (Object.keys(userAssets.head).length > 0) || tryOn?.type === "head"
-
-                                child.material = new THREE.MeshPhongMaterial({
-                                    map: TextureLoader.load(faceMat),
-                                    transparent: true,
-                                    opacity: (existsHead) ? 0 : 1 // If user is wearing a head, hide the default one
-                                })
-
+                                
                                 if (existsHead) {
-                                    const model = ((Object.keys(userAssets.head).length > 0) ? userAssets.head : tryOn)
-                                    quickLoad(model.mesh, new THREE.MeshPhongMaterial({
+                                    child.visible = false
+
+                                    const model = (tryOn?.type === "head") ? tryOn : userAssets.head
+                                    if (model.texture) {
+                                        mergeImages([
+                                            { src: model.texture, x: 0, y: 0 },
+                                            { src: faceMat, x: 512, y: 0 }
+                                        ]).then(imageB64 => {
+                                            console.log(imageB64);
+                                            quickLoad(model.mesh, new THREE.MeshPhongMaterial({
+                                                map: loadImage(imageB64),
+                                                transparent: true,
+                                                side: THREE.DoubleSide,
+
+                                                // am i supposed to use color for gingerbread head?
+                                                //color: userAssets.colors.head
+                                            }))
+                                        })
+                                    } else {
+                                        quickLoad(model.mesh, new THREE.MeshPhongMaterial({
+                                            map: TextureLoader.load(faceMat),
+                                            transparent: true,
+                                            side: THREE.DoubleSide,
+                                        }))
+                                    }
+
+                                } else {
+                                    
+                                    child.material = new THREE.MeshPhongMaterial({
                                         map: TextureLoader.load(faceMat),
                                         transparent: true,
                                         side: THREE.DoubleSide,
                                         opacity: 1
-                                    }))
-                                    break
+                                    })
+
+                                    let bodyColor = child.clone()
+                                    bodyColor.material = headColor
+                                    scene.add(bodyColor)
                                 }
 
-                                const bodyColor = child.clone()
-                                bodyColor.material = headColor
-                                scene.add(bodyColor)
-
-                                // box3D.setFromObject(child);
-                                // box3D.center(controls.target);
+                                box3D.setFromObject(child);
+                                box3D.center(controls.target);
 
                                 break
                             }
@@ -349,15 +388,13 @@ async function renderUser(userId, container, tryOnAsset = null) {
         })
     }
 
-    if (Object.keys(userAssets.head).length || tryOn?.type === "head") {
-        const headID = userAssets.head?.id || tryOn?.id
-        if (Number(headID) !== 4859) {
-            const model = ((Object.keys(userAssets.head).length > 0) ? userAssets.head : tryOn)
-            quickLoad(model.mesh, new THREE.MeshPhongMaterial({
-                color: userAssets.colors.head,
-                side: THREE.DoubleSide
-            }))
-        }
+    if (Object.keys(userAssets.head).length !== 0 || tryOn?.type === "head") {
+        const model = (tryOn?.type === "head") ? tryOn : userAssets.head
+        console.log("rendering second head");
+        quickLoad(model.mesh, new THREE.MeshPhongMaterial({
+            color: userAssets.colors.head,
+            side: THREE.DoubleSide
+        }))
     }
        
 

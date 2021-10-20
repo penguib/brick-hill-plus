@@ -166,9 +166,9 @@ $(document).ready(async() => {
 		})
 	
 		if (!ul?.children[0])
-			ul.appendChild(li)
+			ul?.appendChild(li)
 		else
-			ul.insertBefore(li, ul.children[0])
+			ul?.insertBefore(li, ul?.children[0])
 	
 		const itemData = await getAssetURL(itemID)
 

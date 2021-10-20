@@ -5,12 +5,18 @@ async function getAssetURL(id) {
     const polyApi = "https://api.brick-hill.com/v1/assets/getPoly/1/"
     const assetApi = "https://api.brick-hill.com/v1/assets/get/"
 
-    const res = await fetch(polyApi + id)
+    const res = await fetch(polyApi + id, {
+        headers: {
+            "Access-Control-Allow-Origin": "*"
+        }
+    })
     data = await res.json()
 
     if (data.error)
         return null
     data = data[0]
+
+    console.log(data)
 
     switch (data.type) {
         case "hat": {
@@ -45,15 +51,17 @@ async function getAssetURL(id) {
         }
         case "head": {
             const meshId  = data.mesh.replace("asset://", "")
+            const textureId = data.texture?.replace("asset://", "")
             const mesh = await fetch(assetApi + meshId)
+            const texture = await fetch(assetApi + textureId)
 
             const item = {
-                texture:   null,
+                // this is such an awful fix
+                texture:   (texture.url.includes("undefined")) ? null : texture.url,
                 mesh:      mesh.url,
                 type:      data.type,
                 id:        id
             }
-
 
             return item
         }
