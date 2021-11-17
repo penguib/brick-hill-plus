@@ -23,4 +23,4 @@ let mainDiv = document.getElementsByClassName("bottom-bar")
 
 // If the user is logged in
 if (mainDiv[0])
-    mainDiv[0].childNodes[0].nextSibling.innerHTML += "<li><a href='https://discord.gg/wWsGUfZw4Z'>Discord</a></li>"
+    mainDiv[0].childNodes[0].nextSibling.innerHTML += "<li><a href='https://discord.gg/brick-hill'>Discord</a></li>"

@@ -137,10 +137,14 @@ if (bhpSettings.f_PPD) {
         const posts = parseInt( container[ i + 1 ].innerText.match(/[\d,]+/)[0].replace(/,/g,"") )
         const text = document.createElement("span")
     
-        text.className = "light-gray-text"
+        text.className = "light-gray-text bhp-ppd"
         text.innerText = (posts/days).toFixed(1) + " posts per day"
+
+        const col = document.querySelectorAll(".col-3-12")
     
-        document.querySelectorAll(".col-3-12")[ i / 2 ].appendChild(document.createElement("br"))
-        document.querySelectorAll(".col-3-12")[ i / 2 ].appendChild(text)
+        col[ i / 2 ].appendChild(document.createElement("br"))
+        col[ i / 2 ].appendChild(text)
+
+        col[ i / 2 ].insertBefore(document.createElement("br"), col[i/2].querySelector("span.bhp-ppd").nextSibling)
     }
 }

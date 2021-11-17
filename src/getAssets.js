@@ -5,21 +5,12 @@ async function getAssetURL(id) {
     const polyApi = "https://api.brick-hill.com/v1/assets/getPoly/1/"
     const assetApi = "https://api.brick-hill.com/v1/assets/get/"
 
-    const res = await fetch(polyApi + id, {
-        method: "GET",
-        credentials: "omit",
-        redirect: "follow",
-        headers: {
-            'Access-Control-Allow-Origin':'*'
-        }
-    })
-    data = await res.json()
+    let res = await fetch(polyApi+id)
+    let data = await res.json()
 
     if (data.error)
         return null
     data = data[0]
-
-    console.log(data)
 
     switch (data.type) {
         case "hat": {
@@ -84,6 +75,7 @@ async function getAssetURL(id) {
             return item
         }
     }
+
 }
 
 async function getUserAssets(id) {

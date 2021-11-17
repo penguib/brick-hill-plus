@@ -1,6 +1,5 @@
 function addLockBtt(child) {
     
-    console.log(child);
     if (child.querySelector("button#locked") || child.querySelector("button#unlocked"))
         return
     
@@ -73,7 +72,6 @@ $(document).ready(() => {
 
     const observer = new MutationObserver((mutationsList, o) => {
         wearingContainer.childNodes.forEach(child => {
-            console.log(child);
             addLockBtt(child)
         })
     })

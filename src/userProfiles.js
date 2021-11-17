@@ -104,7 +104,6 @@ let loaded3D = false
 
     userContainer.insertBefore(loadingContainer, userThumbnail)
 $(view3D).click(async () => {
-    console.log("clicked");
     const btt  = $(view3D)
     const text = btt.text()
     const cameraPosition = new THREE.Vector3(-2.9850597402271473, 5.024487076222519, 4.542919202987628)
@@ -174,7 +173,6 @@ if (userId && !window.location.href.includes("friends")) {
     fetch(api + userId)
     .then(res => res.json())
     .then(data => {
-        console.log(data)
         let mainDiv = document.getElementsByClassName("col-6-12")
         let card = document.createElement("div")
         card.className = "card"

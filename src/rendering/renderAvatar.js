@@ -103,7 +103,6 @@ async function renderUser(userId, container, tryOnAsset = null) {
 
             object => {
                 object.traverse(child => {
-                    console.log(child.name);
                     if (child instanceof THREE.Mesh) {
                         switch (child.name) {
                             case "Head_Head_Head_Circle.000": {
@@ -119,17 +118,23 @@ async function renderUser(userId, container, tryOnAsset = null) {
                                     if (model.texture) {
                                         mergeImages([
                                             { src: model.texture, x: 0, y: 0 },
-                                            { src: faceMat, x: 512, y: 0 }
+                                            { src: faceMat, x: 555, y: 31 }
                                         ]).then(imageB64 => {
-                                            console.log(imageB64);
-                                            quickLoad(model.mesh, new THREE.MeshPhongMaterial({
-                                                map: loadImage(imageB64),
-                                                transparent: true,
-                                                side: THREE.DoubleSide,
-
-                                                // am i supposed to use color for gingerbread head?
-                                                //color: userAssets.colors.head
-                                            }))
+                                            parseOBJ(model.mesh, parsed => {
+                                                let m = OBJLoader.parse(parsed)
+                                                m.traverse(c => {
+                                                    console.log(imageB64);
+                                                    c.material =  new THREE.MeshPhongMaterial({
+                                                        map: loadImage(imageB64),
+                                                        transparent: true,
+                                                        side: THREE.DoubleSide,
+        
+                                                        // am i supposed to use color for gingerbread head?
+                                                        //color: userAssets.colors.head
+                                                    })
+                                                    scene.add(c)
+                                                })
+                                            })
                                         })
                                     } else {
                                         quickLoad(model.mesh, new THREE.MeshPhongMaterial({
@@ -390,11 +395,18 @@ async function renderUser(userId, container, tryOnAsset = null) {
 
     if (Object.keys(userAssets.head).length !== 0 || tryOn?.type === "head") {
         const model = (tryOn?.type === "head") ? tryOn : userAssets.head
-        console.log("rendering second head");
-        quickLoad(model.mesh, new THREE.MeshPhongMaterial({
-            color: userAssets.colors.head,
-            side: THREE.DoubleSide
-        }))
+        console.log(model.mesh);
+        parseOBJ(model.mesh, parsed => {
+            console.log(parsed);
+            let m = OBJLoader.parse(parsed)
+            m.traverse(child => {
+                child.material = new THREE.MeshPhongMaterial({
+                    color: userAssets.colors.head,
+                    side: THREE.DoubleSide 
+                })
+            }) 
+            scene.add(m)
+        })
     }
        
 

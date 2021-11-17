@@ -25,7 +25,6 @@ async function friendsPOSTRequest(data) {
           },
         body: JSON.stringify(data)
     }).catch(error => {
-        console.log(error);
     })
 }
 
