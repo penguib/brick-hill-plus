@@ -11,11 +11,6 @@ const storageKeys = {
         null: false
     },
 
-    "f_Signature": {
-        default: "",
-        null: ""
-    }, 
-
     "f_PPD": {
         default: true,
         null: false

@@ -4,6 +4,7 @@ var browser = browser || chrome
 
 const characterMat = browser.runtime.getURL("static/Character.mtl")
 const characterModel = browser.runtime.getURL("static/Character.obj")
+const characterHead = browser.runtime.getURL("static/head.obj")
 
 function loadImage(path) {
     var canvas = document.createElement('canvas');
@@ -106,10 +107,11 @@ async function renderUser(userId, container, tryOnAsset = null) {
                     if (child instanceof THREE.Mesh) {
                         switch (child.name) {
                             case "Head_Head_Head_Circle.000": {
-                                
+                                child.visible = false 
                                 const faceData = userAssets.face
                                 const faceMat = (tryOn?.type === "face") ? tryOn.texture : ((faceData) ? faceData.texture : "http://brkcdn.com/assets/default/face.png")
                                 const existsHead = (Object.keys(userAssets.head).length > 0) || tryOn?.type === "head"
+
                                 
                                 if (existsHead) {
                                     child.visible = false
@@ -123,7 +125,6 @@ async function renderUser(userId, container, tryOnAsset = null) {
                                             parseOBJ(model.mesh, parsed => {
                                                 let m = OBJLoader.parse(parsed)
                                                 m.traverse(c => {
-                                                    console.log(imageB64);
                                                     c.material =  new THREE.MeshPhongMaterial({
                                                         map: loadImage(imageB64),
                                                         transparent: true,
@@ -146,16 +147,16 @@ async function renderUser(userId, container, tryOnAsset = null) {
 
                                 } else {
                                     
-                                    child.material = new THREE.MeshPhongMaterial({
+                                    quickLoad(characterHead, new THREE.MeshPhongMaterial({
                                         map: TextureLoader.load(faceMat),
                                         transparent: true,
                                         side: THREE.DoubleSide,
-                                        opacity: 1
-                                    })
+                                        opacity: 1,
+                                    }))
 
-                                    let bodyColor = child.clone()
-                                    bodyColor.material = headColor
-                                    scene.add(bodyColor)
+                                    quickLoad(characterHead, new THREE.MeshPhongMaterial({
+                                        color: userAssets.colors.head
+                                    }))
                                 }
 
                                 box3D.setFromObject(child);
@@ -395,9 +396,7 @@ async function renderUser(userId, container, tryOnAsset = null) {
 
     if (Object.keys(userAssets.head).length !== 0 || tryOn?.type === "head") {
         const model = (tryOn?.type === "head") ? tryOn : userAssets.head
-        console.log(model.mesh);
         parseOBJ(model.mesh, parsed => {
-            console.log(parsed);
             let m = OBJLoader.parse(parsed)
             m.traverse(child => {
                 child.material = new THREE.MeshPhongMaterial({

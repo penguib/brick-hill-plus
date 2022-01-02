@@ -29,10 +29,6 @@ function getYoutubeID(link) {
     return "https://www.youtube.com/embed/" + ((match[5] === "watch") ? match[6].match(/\?t=[0-9]+\&v=([a-zA-Z0-9]+)&feature=youtu.be/)[1] : match[5]).toUpperCase()
 }
 
-if (bhpSettings.f_Signature) {
-    forumBody.innerHTML = "\n".repeat(lineBreaks) + bhpSettings.f_Signature.substring(0, 100)
-}
-
 let replies = document.querySelectorAll("blockquote.red")
 
 if (bhpSettings.f_ImageEmbeds) {

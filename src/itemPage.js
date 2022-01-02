@@ -1,12 +1,16 @@
 const bucksConversion = bhpSettings.shopConversions || 0.01
 const allowedItemTypes = [ "Hat", "Head", "Tool", "Face" ]
-const allowed3DItemTypes = [ "Hat", "Tool" ]
+const allowed3DItemTypes = [ "Hat", "Tool", "Face", "Shirt", "Tshirt", "Pants" ]
 const userID = $("meta[name='user-data']")?.attr("data-id")
 
 // To keep track if the user actually wants to see them in 3D
 // No reason to render it if the user won't use it
 let loadedItem = false
 let loadedUser = false
+// Keep track if they clicked the 3D button or not so we don't
+// load multiple instances of 3D rendering
+let clickedItem = false
+let clickedUser = false
 
 // only set itemType if we are on an item page, not just /shop/
 const itemType = (!window.location.href.match(/[0-9]+/)) ? null : document.getElementsByClassName("padding-bottom")[0].childNodes[1].childNodes[3].innerText
@@ -94,13 +98,34 @@ $(document).ready(async() => {
 					// Setting the height prevents an annoying resizing bug
 					$(itemContainer).css("height", comp.height)
 
-					if (!loadedItem) {
+					if (!loadedItem && !clickedItem) {
+						clickedItem = true
 						itemImg.hide()
 						if (avatarViewer.length)
 							avatarViewer.hide()
 
 						$(loadingContainer).show()
-						loadedItem = await renderItem(itemID, itemBox)
+						switch (itemType.toLowerCase()) {
+							case "face": {
+								loadedItem = await renderItem(itemID, itemBox, "face")
+								break
+							}
+							case "shirt": {
+								loadedItem = await renderItem(itemID, itemBox, "shirt")
+								break
+							}
+							case "tshirt": {
+								loadedItem = await renderItem(itemID, itemBox, "tshirt")
+								break
+							}
+							case "pants": {
+								loadedItem = await renderItem(itemID, itemBox, "pants")
+								break
+							}
+							default: {
+								loadedItem = await renderItem(itemID, itemBox)
+							}
+						}
 						$(loadingContainer).hide()
 
 						itemBox.insertBefore(loadedItem.renderer.domElement, itemBoxChildren[0])
@@ -195,7 +220,8 @@ $(document).ready(async() => {
 	
 				$(itemContainer).css("height", comp.height)
 
-				if (!loadedUser) {
+				if (!loadedUser && !clickedUser) {
+					clickedUser = true
 					$(loadingContainer).show()
 
 					itemImg.hide()

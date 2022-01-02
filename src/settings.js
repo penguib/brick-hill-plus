@@ -23,7 +23,6 @@ const conversionToSelected = value => {
 const forumImageEmbeds = (bhpSettings.f_ImageEmbeds !== undefined) ? booleanToChecked(bhpSettings.f_ImageEmbeds) : "checked"
 const forumBadges      = (bhpSettings.f_Badges !== undefined)      ? booleanToChecked(bhpSettings.f_Badges)      : "checked"
 const forumPPD         = (bhpSettings.f_PPD !== undefined)         ? booleanToChecked(bhpSettings.f_PPD)         : "checked"
-const forumSignature   = (bhpSettings.f_Signature !== undefined)   ? bhpSettings.f_Signature                     : ""
 
 const messagesImageEmbeds = (bhpSettings.m_ImageEmbeds !== undefined) ? booleanToChecked(bhpSettings.m_ImageEmbeds) : "checked"
 
@@ -46,9 +45,6 @@ bhplusSettingsCard.innerHTML = `
                         <span class="dark-gray-text" style="padding-bottom: 5px;">Posts Per Day</span>
                         <input class="f-right" type="checkbox" id="bhp-forumPPD" ${forumPPD}>
                     </div>
-                    <br>
-                    <span class="dark-gray-text" style="padding-bottom: 5px;">Forums Signature</span>
-                    <input id="bhp-forumSignature" class="width-100 block" maxlength="100" placeholder="100 characters max" style="margin-bottom: 6px;" type="text"></input>
                     <hr>
                     <span class="dark-gray-text bold block" style="padding-bottom: 5px;">Messages</span>
                     <div class="block">
@@ -88,7 +84,6 @@ bhplusSettingsColumn.appendChild(bhplusSettingsCard)
 
 // appending the text after the element is in the DOM to prevent XSS
 // thanks to Dragonian
-$("bhp-forumSignature").value = forumSignature
 $("bhp-CBName").value = navbarButton.name
 $("bhp-CBLink").value = navbarButton.link
 
@@ -98,7 +93,6 @@ document.getElementById("bhp-save").addEventListener("click", () => {
     storage.set("bhp-settings", {
         f_ImageEmbeds: $("bhp-forumImageEmbeds").checked,
         f_Badges:      $("bhp-forumBadges").checked,
-        f_Signature:   $("bhp-forumSignature").value,
         f_PPD:         $("bhp-forumPPD").checked,
 
         m_ImageEmbeds: $("bhp-messagesImageEmbeds").checked,

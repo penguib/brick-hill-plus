@@ -42,12 +42,14 @@ if (bhpSettings.f_Badges) {
             let isAdmin = awards.find(award => award.award_id === 3)
 
             // Add a break for non-admins so that the awards are under their post count
-            let s = (isAdmin) ? "" : "<br>"
+            let html = (bhpSettings.f_PPD) ? "" : "<br>"
+            if (isAdmin) 
+                html = ""
 
-            for (let award of awards) {
-                s += `<img src="https://www.brick-hill.com/images/awards/${award.award_id}.png" style="width:40px">`
-            }
-            mainDiv.innerHTML += s
+            for (let award of awards)
+                html += `<img src="https://www.brick-hill.com/images/awards/${award.award_id}.png" style="width:40px">`
+
+            mainDiv.innerHTML += html
         })
     }
 }
@@ -130,6 +132,7 @@ if (bhpSettings.f_PPD) {
     for (let i = 0, len = container.length; i < len; i += 2) {
     
         // Finding the users' join date to calculate total days
+        const isStaff = container[i].parentNode.querySelectorAll("div[style='color:#0f0fa2;'], div.red-text").length
         let date = container[i].innerText.match(/(\d+)\/(\d+)\/(\d+)/)
         date = new Date(`${date[3]} ${date[2]} ${date[1]}`)
     
@@ -141,10 +144,12 @@ if (bhpSettings.f_PPD) {
         text.innerText = (posts/days).toFixed(1) + " posts per day"
 
         const col = document.querySelectorAll(".col-3-12")
+        const curColumn = col[i / 2]
     
-        col[ i / 2 ].appendChild(document.createElement("br"))
-        col[ i / 2 ].appendChild(text)
+        if (!isStaff)
+            curColumn.appendChild(document.createElement("br"))
+        curColumn.appendChild(text)
 
-        col[ i / 2 ].insertBefore(document.createElement("br"), col[i/2].querySelector("span.bhp-ppd").nextSibling)
+        curColumn.insertBefore(document.createElement("br"), curColumn.querySelector("span.bhp-ppd").nextSibling)
     }
 }
