@@ -48,7 +48,6 @@ async function renderItem(itemID, container, type = "") {
             model.traverse(child => {
                 child.material = new THREE.MeshPhongMaterial({
                     [[ (texture) ? "map" : "color" ]]: (texture) ? mapOverlay : color,
-                    map: (texture) ? mapOverlay : null,
                     transparent: true
                 })
 
