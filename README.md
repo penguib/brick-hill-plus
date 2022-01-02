@@ -1,6 +1,8 @@
 <p align="center" style="text-align: center"><img src="https://cdn.discordapp.com/attachments/803658597476859984/814693847652892682/PLUS.png" width="250" alt="bh+ logo"/></p>
 <h1 align="center">Brick Hill+</h1>
 
+[![Chrome Web Store Users](https://img.shields.io/chrome-web-store/users/hendnmfbkcgmpafikljbfhpgphdilohj?label=Chrome%20Users&style=flat&logo=google)](https://chrome.google.com/webstore/detail/brick-hill%2B/hendnmfbkcgmpafikljbfhpgphdilohj)
+[![Mozilla downloads](https://img.shields.io/amo/users/brick-hill?label=Firefox%20Users&style=flat&logo=firefox)](https://addons.mozilla.org/en-US/firefox/addon/brick-hill/)
 
 ## About
 Brick Hill+ is a browser extension that gives users access to features that Brick Hill hasn't implemented yet. Download the extension to your corresponding browser
