@@ -61,12 +61,15 @@ async function renderUser(userId, container, tryOnAsset = null) {
     const userConfig = config.user
 
     const scene = new THREE.Scene()
-    const light = new THREE.HemisphereLight(
-        userConfig.light.skyColor, 
-        userConfig.light.groundColor, 
-        userConfig.light.intensity
-        );
-    scene.add(light);
+    // const light = new THREE.HemisphereLight(
+    //     userConfig.light.skyColor, 
+    //     userConfig.light.groundColor, 
+    //     userConfig.light.intensity
+    //     );
+    // scene.add(light);
+
+    const directionalLight = new THREE.DirectionalLight( 0xffffff, 20 );
+    scene.add( directionalLight );
 
     const camera = new THREE.PerspectiveCamera(
         userConfig.camera.fov, 
@@ -123,7 +126,6 @@ async function renderUser(userId, container, tryOnAsset = null) {
                                             parseOBJ(model.mesh, parsed => {
                                                 let m = OBJLoader.parse(parsed)
                                                 m.traverse(c => {
-                                                    console.log(imageB64);
                                                     c.material =  new THREE.MeshPhongMaterial({
                                                         map: loadImage(imageB64),
                                                         transparent: true,
@@ -395,9 +397,7 @@ async function renderUser(userId, container, tryOnAsset = null) {
 
     if (Object.keys(userAssets.head).length !== 0 || tryOn?.type === "head") {
         const model = (tryOn?.type === "head") ? tryOn : userAssets.head
-        console.log(model.mesh);
         parseOBJ(model.mesh, parsed => {
-            console.log(parsed);
             let m = OBJLoader.parse(parsed)
             m.traverse(child => {
                 child.material = new THREE.MeshPhongMaterial({

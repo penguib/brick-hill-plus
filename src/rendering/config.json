@@ -3,7 +3,7 @@
         "light": {
             "skyColor": "0xFFFFFF",
             "groundColor": "0xB1B1B1",
-            "intensity": 1
+            "intensity": 2
         },
         "camera": {
             "fov": 75,
