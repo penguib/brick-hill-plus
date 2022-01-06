@@ -47,11 +47,10 @@ async function getAssetURL(id) {
             const meshId  = data.mesh.replace("asset://", "")
             const textureId = data.texture?.replace("asset://", "")
             const mesh = await fetch(assetApi + meshId)
-            const texture = await fetch(assetApi + textureId)
+            const texture = (textureId) ? await fetch(assetApi + textureId) : null
 
             const item = {
-                // this is such an awful fix
-                texture:   (texture.url.includes("undefined")) ? null : texture.url,
+                texture:   (!texture) ? null : texture.url,
                 mesh:      mesh.url,
                 type:      data.type,
                 id:        id

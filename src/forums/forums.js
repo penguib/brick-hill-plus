@@ -54,6 +54,14 @@ if (bhpSettings.f_Badges) {
     }
 }
 
+async function gconfig() {
+    var browser = browser || chrome
+    const configURL = browser.runtime.getURL("src/settings.json")
+    const res = await fetch(configURL)
+    const json = await res.json()
+    return json
+}
+
 if (bhpSettings.f_ImageEmbeds) {
     for (let reply of replies) {
 

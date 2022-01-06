@@ -1,6 +1,6 @@
 {
     "name": "Brick Hill+",
-    "version": "1.0.7.1",
+    "version": "1.0.7.2",
     "description": "Adds features around the Brick Hill website to make navigating, talking, customizing avatars, and more much easier.",
     "manifest_version": 2,
 
@@ -13,9 +13,18 @@
                 "./lib/jquery.js", 
                 "./lib/LZString.js", 
                 "./src/utils/storage.js",
-                "./src/navbar.js" 
+                "./src/allPages.js"
             ],
-            "run_at": "document_idle"
+            "run_at": "document_start"
+        },
+        {
+            "matches": [
+                "https://www.brick-hill.com/*"
+            ],
+            "js": [
+                "./src/navbar.js"
+            ],
+            "run_at": "document_end"
         },
         {
             "matches": [
@@ -32,22 +41,26 @@
                 "./lib/OrbitControls.js", 
                 "./lib/MTLLoader.js", 
                 "./src/userProfiles.js"
-            ]
+            ],
+            "run_at": "document_end"
         },
         {
             "matches": [
                 "https://www.brick-hill.com/forum",
                 "https://www.brick-hill.com/forum/"
             ],
-            "js": [ "./src/forums/forumsHome.js" ]
+            "js": [ "./src/forums/forumsHome.js" ],
+            "run_at": "document_end"
         },
         {
             "matches": [
                 "https://www.brick-hill.com/forum/thread/*"
             ],
             "js": [ 
+                "./src/rendering/getConfig.js",
                 "./src/forums/forums.js" 
-            ]
+            ],
+            "run_at": "document_end"
         },
         {
             "matches": [
@@ -56,14 +69,16 @@
                 "https://www.brick-hill.com/forum/reply/*/",
                 "https://www.brick-hill.com/forum/reply/*"
             ],
-            "js": [ "./src/forums/createPost.js" ]
+            "js": [ "./src/forums/createPost.js" ],
+            "run_at": "document_end"
         },
         {
             "matches": [
                 "https://www.brick-hill.com/forum/*",
                 "https://www.brick-hill.com/forum"
             ],
-            "js": [ "./src/forums/allForums.js" ]
+            "js": [ "./src/forums/allForums.js" ],
+            "run_at": "document_end"
         },
         {
             "matches": [
@@ -72,7 +87,8 @@
             ],
             "js": [
                 "./src/settings.js" 
-            ]
+            ],
+            "run_at": "document_end"
         },
         {
             "matches": [
@@ -80,7 +96,6 @@
             ],
             "js": [ 
                 "./lib/imageMerger.js",
-                "./src/utils/brickHillPlus.js",
                 "./src/rendering/getConfig.js",
                 "./src/rendering/renderAvatar.js",
                 "./src/getAssets.js",
@@ -90,7 +105,8 @@
                 "./lib/OrbitControls.js", 
                 "./src/rendering/renderItem.js",
                 "./src/itemPage.js"
-            ]
+            ],
+            "run_at": "document_end"
         },
         {
             "matches": [
@@ -102,27 +118,33 @@
                 "./src/avatar/lockItems.js",
                 "./src/avatar/customize.js" 
             ],
-            "run_at": "document_idle"
+            "run_at": "document_end"
         },
         {
             "matches": [
                 "https://www.brick-hill.com/message/*"
             ],
-            "js": [ "./src/messages.js" ]
+            "js": [ "./src/messages.js" ],
+            "run_at": "document_end"
         },
         {
             "matches": [
                 "https://www.brick-hill.com/friends/",
                 "https://www.brick-hill.com/friends"
             ],
-            "js": [ "./src/friends.js" ]
+            "js": [ "./src/friends.js" ],
+            "run_at": "document_end"
         }
     ],
     "web_accessible_resources": [
         "/src/rendering/config.json",
+        "/src/settings.json",
+
         "/src/avatar/randomizerPurger.js",
+
         "/static/Character.mtl",
         "/static/Character.obj",
+
         "/static/head.obj",
         "/static/torso.obj",
         "/static/right_arm.obj",

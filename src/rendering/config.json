@@ -1,39 +1,64 @@
 {
-    "user": {
-        "light": {
-            "skyColor": "0xFFFFFF",
-            "groundColor": "0xB1B1B1",
-            "intensity": 1
+    "camera": {
+        "fov": 75,
+        "aspect": 1,
+        "near": 0.1,
+        "far": 1000,
+        "position": {
+            "x": -2.97,
+            "y": 5.085,
+            "z": 4.52
         },
-        "camera": {
-            "fov": 75,
-            "aspect": 1,
-            "near": 0.1,
-            "far": 1000,
-            "position": {
-                "x": 0,
-                "y": 0,
-                "z": 0
-            }
+        "controls": {
+            "auto_rotate": true,
+            "enable_zoom": true,
+            "distance": {
+                "min": 1,
+                "max": 10
+            },
+            "enable_pan": false
         }
     },
 
-    "item": {
-        "light": {
-            "skyColor": "0xFFFFFF",
-            "groundColor": "0xB1B1B1",
-            "intensity": 1
+    "renderer": {
+        "anti_alias": true,
+        "alpha": true,
+        "size": {
+            "x": 375,
+            "y": 375
+        }
+    },
+
+    "light": {
+        "sky_color": "#FFFFFF",
+        "ground_color": "#B1B1B1",
+        "intensity": 1
+    },
+
+    "colors": {
+        "yellow": "#F3B700",
+        "gray": "#A7A7A7",
+        "white": "#FFFFFF"
+    },
+
+    "merge_images": {
+        "image_position": {
+            "x": 555,
+            "y": 31
         },
-        "camera": {
-            "fov": 75,
-            "aspect": 1,
-            "near": 0.1,
-            "far": 1000,
-            "position": {
-                "x": 0,
-                "y": 0,
-                "z": 0
-            }
+        "default_face": "https://brkcdn.com/assets/default/face.png"
+    },
+
+    "tshirt": {
+        "position": {
+            "y": 3,
+            "z": 0.5001
+        },
+        "render_order": 3,
+        "geometry": {
+            "x": 2,
+            "y": 1.9,
+            "z": 1
         }
     }
 }
