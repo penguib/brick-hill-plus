@@ -1,4 +1,16 @@
-async function renderItem(itemID, container) {
+var browser = browser || chrome
+const headOBJ = browser.runtime.getURL("static/head.obj")
+const torsoOBJ = browser.runtime.getURL("static/torso.obj")
+const rArmOBJ = browser.runtime.getURL("static/right_arm.obj")
+const lArmOBJ = browser.runtime.getURL("static/left_arm.obj")
+const rLegOBJ = browser.runtime.getURL("static/right_leg.obj")
+const lLegOBJ = browser.runtime.getURL("static/left_leg.obj")
+
+const yellow = "#F3B700"
+const gray = "#A7A7A7"
+const white = "#FFFFFF"
+
+async function renderItem(itemID, container, type = "") {
     if (!itemID)
         return null
 
@@ -31,23 +43,86 @@ async function renderItem(itemID, container) {
         })
     }
 
-    const texture = new THREE.TextureLoader();
-    const mapOverlay = texture.load(itemData.texture);
+    const quickLoad = (obj, color, center = false, texture = true) => {
+        OBJloader.load(obj, model => {
+            model.traverse(child => {
+                child.material = new THREE.MeshPhongMaterial({
+                    [[ (texture) ? "map" : "color" ]]: (texture) ? mapOverlay : color,
+                    transparent: true
+                })
+
+                if (center) {
+                    box3D.setFromObject(child)
+                    box3D.center(controls.target)
+                }
+
+                scene.add(child)
+
+                if (texture) {
+                    const bodyColor = child.clone()
+                    bodyColor.material = new THREE.MeshPhongMaterial({ color })
+                    scene.add(bodyColor)
+                }
+
+            })
+        })
+    }
+
+    const mapOverlay = TextureLoader.load(itemData.texture);
     const material = new THREE.MeshPhongMaterial({
         map: mapOverlay,
         side: THREE.DoubleSide
     });
 
-    parseOBJ(itemData.mesh, parsed => {
-        let model = OBJloader.parse(parsed)
-        model.traverse(child => {
-            child.material = material
-        })
+    switch (type.toLowerCase()) {
+        case "face": {
+            quickLoad(headOBJ, yellow, true) 
+            break;
+        }
+        case "shirt": {
+            quickLoad(torsoOBJ, gray, true)
+            quickLoad(rArmOBJ, yellow)
+            quickLoad(lArmOBJ, yellow)
+            break
+        }
+        case "tshirt": {
+            quickLoad(torsoOBJ, gray, true, false)
 
-        box3D.setFromObject(model);
-        box3D.center(controls.target);
-        scene.add(model)
-    })
+            const geometry = new THREE.PlaneGeometry(2, 1.9, 1)
+            const plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
+                map: mapOverlay,
+                transparent: true
+            }))
+
+            scene.add(plane)
+            plane.renderOrder = 3
+            plane.position.y = 3
+            plane.position.z = 0.5001
+
+            quickLoad(rArmOBJ, yellow, false, false)
+            quickLoad(lArmOBJ, yellow, false, false)
+            break
+        }
+        case "pants": {
+            quickLoad(torsoOBJ, gray, true)
+            quickLoad(rLegOBJ, white)
+            quickLoad(lLegOBJ, white)
+            break
+        }
+        default: {
+            parseOBJ(itemData.mesh, parsed => {
+                let model = OBJloader.parse(parsed)
+                model.traverse(child => {
+                    child.material = material
+                })
+
+                box3D.setFromObject(model);
+                box3D.center(controls.target);
+                scene.add(model)
+            })
+        }
+    }
+
 
     // camera controls
     var controls = new THREE.OrbitControls( camera, container );

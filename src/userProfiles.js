@@ -91,18 +91,19 @@ $(view3D).css({
 })
 view3D.innerText = "3D"
 let loaded3D = false
+let clicked3D = false
 
-    const imgs = $(userContainer).find('img')
-    const userThumbnail = imgs.toArray().find(i => i.src.includes("brkcdn"))
+const imgs = $(userContainer).find('img')
+const userThumbnail = imgs.toArray().find(i => i.src.includes("brkcdn"))
 
-    const loadingContainer = document.createElement('div')
-    $(loadingContainer).css("height", "327px")
-    $(loadingContainer).hide()
-    const loadingGif = document.createElement('div')
-    loadingGif.classList = "loader"
-    loadingContainer.appendChild(loadingGif)
+const loadingContainer = document.createElement('div')
+$(loadingContainer).css("height", "327px")
+$(loadingContainer).hide()
+const loadingGif = document.createElement('div')
+loadingGif.classList = "loader"
+loadingContainer.appendChild(loadingGif)
 
-    userContainer.insertBefore(loadingContainer, userThumbnail)
+userContainer.insertBefore(loadingContainer, userThumbnail)
 $(view3D).click(async () => {
     const btt  = $(view3D)
     const text = btt.text()
@@ -110,7 +111,8 @@ $(view3D).click(async () => {
 
     if (text.includes("3D")) {
 
-        if (!loaded3D) {
+        if (!loaded3D && !clicked3D) {
+            clicked3D = true
             $(userThumbnail).hide()
             $(loadingContainer).show()
             loaded3D = await renderUser(userId, userContainer)

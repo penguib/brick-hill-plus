@@ -1,6 +1,6 @@
 {
     "name": "Brick Hill+",
-    "version": "1.0.7.0",
+    "version": "1.0.7.3",
     "description": "Adds features around the Brick Hill website to make navigating, talking, customizing avatars, and more much easier.",
     "manifest_version": 2,
 
@@ -15,7 +15,7 @@
                 "./src/utils/storage.js",
                 "./src/navbar.js" 
             ],
-            "run_at": "document_idle"
+            "run_at": "document_start"
         },
         {
             "matches": [
@@ -32,7 +32,8 @@
                 "./lib/OrbitControls.js", 
                 "./lib/MTLLoader.js", 
                 "./src/userProfiles.js"
-            ]
+            ],
+            "run_at": "document_end"
         },
         {
             "matches": [
@@ -122,7 +123,13 @@
         "/src/rendering/config.json",
         "/src/avatar/randomizerPurger.js",
         "/static/Character.mtl",
-        "/static/Character.obj"
+        "/static/Character.obj",
+        "/static/head.obj",
+        "/static/torso.obj",
+        "/static/right_arm.obj",
+        "/static/left_arm.obj",
+        "/static/right_leg.obj",
+        "/static/left_leg.obj"
     ],
     "icons": {
         "16":"./icons/PLUS16.png",
