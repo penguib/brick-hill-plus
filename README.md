@@ -1,4 +1,4 @@
-<p align="center" style="text-align: center"><img src="https://cdn.discordapp.com/attachments/803658597476859984/814693847652892682/PLUS.png" width="250" alt="bh+ logo"/></p>
+<p align="center" style="text-align: center"><img src="https://www.brick-hill.plus/static/media/bhp.png" width="250" alt="bh+ logo"/></p>
 <h1 align="center">Brick Hill+</h1>
 
 [![Chrome Web Store Users](https://img.shields.io/chrome-web-store/users/hendnmfbkcgmpafikljbfhpgphdilohj?label=Chrome%20Users&style=flat&logo=google)](https://chrome.google.com/webstore/detail/brick-hill%2B/hendnmfbkcgmpafikljbfhpgphdilohj)
