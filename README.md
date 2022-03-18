@@ -5,7 +5,7 @@
 [![Mozilla downloads](https://img.shields.io/amo/users/brick-hill?label=Firefox%20Users&style=flat&logo=firefox)](https://addons.mozilla.org/en-US/firefox/addon/brick-hill/)
 
 ## About
-Brick Hill+ is a browser extension that gives users access to features that Brick Hill hasn't implemented yet. Download the extension to your corresponding browser
+[Brick Hill+](https://www.brick-hill.plus/) is a browser extension that gives users access to features that Brick Hill hasn't implemented yet. Download the extension to your corresponding browser
 
 [![Chrome](https://github.com/alrra/browser-logos/blob/main/src/chrome/chrome_64x64.png "Chrome")](https://chrome.google.com/webstore/detail/brick-hill%20/hendnmfbkcgmpafikljbfhpgphdilohj?hl=en)
 [![Firefox](https://github.com/alrra/browser-logos/blob/main/src/firefox/firefox_64x64.png "FireFox")](https://addons.mozilla.org/en-US/firefox/addon/brick-hill/)
