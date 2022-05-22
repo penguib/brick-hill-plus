@@ -47,11 +47,19 @@ if (bhpSettings.f_Badges) {
                 html = ""
 
             for (let award of awards)
-                html += `<img src="https://www.brick-hill.com/images/awards/${award.award_id}.png" style="width:40px">`
+                html += `<img src="https://www.brick-hill.com/images/awards/${award.award_id}.png" style="width: 40px; border-radius: 100%">`
 
             mainDiv.innerHTML += html
         })
     }
+}
+
+async function gconfig() {
+    var browser = browser || chrome
+    const configURL = browser.runtime.getURL("src/settings.json")
+    const res = await fetch(configURL)
+    const json = await res.json()
+    return json
 }
 
 if (bhpSettings.f_ImageEmbeds) {
@@ -153,3 +161,9 @@ if (bhpSettings.f_PPD) {
         curColumn.insertBefore(document.createElement("br"), curColumn.querySelector("span.bhp-ppd").nextSibling)
     }
 }
+
+var browser = browser || chrome
+console.log(browser)
+browser.runtime.sendMessage({greeting: "hello"}, function(response) {
+    console.log("sent!")
+});

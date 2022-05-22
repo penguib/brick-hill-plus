@@ -1,6 +1,13 @@
 const $ = e => { return document.getElementById(e) }
 const bhplusSettingsColumn = document.createElement("div")
 const settingsMainDiv = document.getElementsByClassName("main-holder grid")[0]
+const notifierConstants = {
+    specials:     1 << 0,
+    newItems:     1 << 1,
+    updatedItems: 1 << 2,
+    tweets:       1 << 3,
+    firstItem:    1 << 4,
+};
 
 bhplusSettingsColumn.className = "col-10-12 push-1-12"
 settingsMainDiv.appendChild(bhplusSettingsColumn)
@@ -15,7 +22,6 @@ const booleanToChecked = value => {
 }
 
 // same as above, but instead of "checked" it's "selected"
-
 const conversionToSelected = value => {
     return (value === Number(bhpSettings.shopConversions)) ? "selected" : ""
 }
@@ -27,12 +33,13 @@ const forumPPD         = (bhpSettings.f_PPD !== undefined)         ? booleanToCh
 const messagesImageEmbeds = (bhpSettings.m_ImageEmbeds !== undefined) ? booleanToChecked(bhpSettings.m_ImageEmbeds) : "checked"
 
 const navbarButton  = (bhpSettings.n_CustomButton.name !== "") ? bhpSettings.n_CustomButton : { name: "", link: "" }
+const navbarColoredIcons = (bhpSettings.n_ColoredIcons !== undefined) ? booleanToChecked(bhpSettings.n_ColoredIcons) : "checked"
 
 bhplusSettingsCard.innerHTML = `
                 <div id="bhp-success" class="alert success" style="display:none">Brick Hill+ settings have been saved</div>
                 <div class="blue top">Brick Hill+ Settings</div>
                 <div class="content">
-                    <span class="dark-gray-text bold block" style="padding-bottom: 5px;">Forums</span>
+                    <span class="dark-gray-text very-bold block" style="padding-bottom: 5px;">Forums</span>
                     <div class="block">
                         <span class="dark-gray-text" style="padding-bottom: 5px;">Image Embeds</span>
                         <input class="f-right" type="checkbox" id="bhp-forumImageEmbeds" ${forumImageEmbeds}>
@@ -46,13 +53,13 @@ bhplusSettingsCard.innerHTML = `
                         <input class="f-right" type="checkbox" id="bhp-forumPPD" ${forumPPD}>
                     </div>
                     <hr>
-                    <span class="dark-gray-text bold block" style="padding-bottom: 5px;">Messages</span>
+                    <span class="dark-gray-text very-bold block" style="padding-bottom: 5px;">Messages</span>
                     <div class="block">
                         <span class="dark-gray-text" style="padding-bottom: 5px;">Image Embeds</span>
                         <input class="f-right" type="checkbox" id="bhp-messagesImageEmbeds" ${messagesImageEmbeds}>
                     </div>
                     <hr>
-                    <span class="dark-gray-text bold block" style="padding-bottom: 5px;">Shop</span>
+                    <span class="dark-gray-text very-bold block" style="padding-bottom: 5px;">Shop</span>
                     <div class="block">
                         <span class="dark-gray-text" style="padding-bottom: 5px;">Buck/Bit Conversions</span>
                         <div class="inline f-right" style="width: 50%; max-width: 200px;">
@@ -69,11 +76,41 @@ bhplusSettingsCard.innerHTML = `
                     </div>
                     <br>
                     <hr>
-                    <span class="dark-gray-text bold block" style="padding-bottom: 5px;">Navbar</span>
+                    <span class="dark-gray-text very-bold block" style="padding-bottom: 5px;">Navbar</span>
                     <span class="dark-gray-text" style="padding-bottom: 5px;">Custom Button</span>
                     <input id="bhp-CBName" class="block" maxlength="20" placeholder="Button name" style="margin-bottom: 6px;" type="text"></input>
                     <input id="bhp-CBLink" class="block" placeholder="Button link" style="margin-bottom: 6px;" type="text"></input>
+                    <div class="block">
+                        <span class="dark-gray-text" style="padding-bottom: 5px;">Colored Icons</span>
+                        <input class="f-right" type="checkbox" id="bhp-coloredIcons" ${navbarColoredIcons}>
+                    </div>
                     <br>
+
+                    <hr>
+                    <span class="dark-gray-text very-bold block" style="padding-bottom: 5px;">Notifier</span>
+                    <div class="block">
+                        <span class="dark-gray-text" style="padding-bottom: 5px;">Tweets from @hillofbricks</span>
+                        <input class="f-right" type="checkbox" id="bhp-notifierTweets">
+                    </div>
+                    <div class="block">
+                        <span class="dark-gray-text" style="padding-bottom: 5px;">Updates of first shop item</span>
+                        <input class="f-right" type="checkbox" id="bhp-notifierFirstItem">
+                    </div>
+                    <br> 
+                    <div class="block">
+                        <span class="dark-gray-text" style="padding-bottom: 5px;">Specials</span>
+                        <input class="f-right" type="checkbox" id="bhp-notifierSpecials">
+                    </div>
+                    <div>
+                        <span class="dark-gray-text" style="padding-bottom: 5px;">New items</span>
+                        <input class="f-right" type="checkbox" id="bhp-notifierNew">
+                    </div>
+                    <div>
+                        <span class="dark-gray-text" style="padding-bottom: 5px;">Updated items</span>
+                        <input class="f-right" type="checkbox" id="bhp-notifierUpdated">
+                    </div>
+                    <br> 
+
                     <button id="bhp-save" class="button small blue">Save</button>
                     <br>
                 </div>
@@ -82,11 +119,22 @@ bhplusSettingsCard.innerHTML = `
                 `
 bhplusSettingsColumn.appendChild(bhplusSettingsCard)
 
+browser.storage.sync.get("settings", settingsObj => {
+    let notifierSettings = settingsObj.settings
+    if (!notifierSettings || Object.keys(settingsObj.settings).length === 0) {
+        notifierSettings = 0x1F;
+    }
+    $("bhp-notifierTweets").checked = ((notifierConstants.tweets & notifierSettings) ? true : false)
+    $("bhp-notifierFirstItem").checked = ((notifierConstants.firstItem & notifierSettings) ? true : false)
+    $("bhp-notifierSpecials").checked = ((notifierConstants.specials & notifierSettings) ? true : false)
+    $("bhp-notifierNew").checked = ((notifierConstants.newItems & notifierSettings) ? true : false)
+    $("bhp-notifierUpdated").checked = ((notifierConstants.updatedItems & notifierSettings) ? true : false)
+})
+
 // appending the text after the element is in the DOM to prevent XSS
 // thanks to Dragonian
 $("bhp-CBName").value = navbarButton.name
 $("bhp-CBLink").value = navbarButton.link
-
 
 document.getElementById("bhp-save").addEventListener("click", () => {
 
@@ -102,8 +150,20 @@ document.getElementById("bhp-save").addEventListener("click", () => {
         n_CustomButton: {
             name: $("bhp-CBName").value,
             link: $("bhp-CBLink").value
-        }
+        },
 
+        n_ColoredIcons: $("bhp-coloredIcons").checked
+
+    })
+
+    browser.storage.sync.set({
+        settings: storage.setNotifierSettings([ 
+            $("bhp-notifierSpecials"), 
+            $("bhp-notifierNew"),
+            $("bhp-notifierUpdated"),
+            $("bhp-notifierTweets"),
+            $("bhp-notifierFirstItem"),
+         ])
     })
 
     $("bhp-success").style = ""

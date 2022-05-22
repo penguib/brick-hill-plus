@@ -5,7 +5,8 @@ async function getAssetURL(id) {
     const polyApi = "https://api.brick-hill.com/v1/assets/getPoly/1/"
     const assetApi = "https://api.brick-hill.com/v1/assets/get/"
 
-    let res = await fetch(polyApi+id)
+    // const?
+    let res  = await fetch(polyApi+id)
     let data = await res.json()
 
     if (data.error)
@@ -15,9 +16,9 @@ async function getAssetURL(id) {
     switch (data.type) {
         case "hat": {
             const textureId = data.texture.replace("asset://", "")
-            const meshId  = data.mesh.replace("asset://", "")
-            const texture = await fetch(assetApi + textureId)
-            const mesh = await fetch(assetApi + meshId)
+            const meshId    = data.mesh.replace("asset://", "")
+            const texture   = await fetch(assetApi + textureId)
+            const mesh      = await fetch(assetApi + meshId)
 
             const item = {
                 texture: texture.url,
@@ -30,9 +31,9 @@ async function getAssetURL(id) {
         }
         case "tool": {
             const textureId = data.texture.replace("asset://", "")
-            const meshId  = data.mesh.replace("asset://", "")
-            const texture = await fetch(assetApi + textureId)
-            const mesh = await fetch(assetApi + meshId)
+            const meshId    = data.mesh.replace("asset://", "")
+            const texture   = await fetch(assetApi + textureId)
+            const mesh      = await fetch(assetApi + meshId)
 
             const item = {
                 texture: texture.url,
@@ -44,14 +45,14 @@ async function getAssetURL(id) {
             return item
         }
         case "head": {
-            const meshId  = data.mesh.replace("asset://", "")
+            const meshId    = data.mesh.replace("asset://", "")
             const textureId = data.texture?.replace("asset://", "")
-            const mesh = await fetch(assetApi + meshId)
-            const texture = await fetch(assetApi + textureId)
+            const mesh      = await fetch(assetApi + meshId)
+            const texture   = (textureId) ? await fetch(assetApi + textureId) : null
 
             const item = {
-                // this is such an awful fix
-                texture:   (texture.url.includes("undefined")) ? null : texture.url,
+                // do i need  thihs?
+                texture:   (!texture) ? null : texture.url,
                 mesh:      mesh.url,
                 type:      data.type,
                 id:        id
@@ -63,7 +64,7 @@ async function getAssetURL(id) {
             if (!data.type)
                 return null
             const textureId  = data.texture.replace("asset://", "")
-            const texture = await fetch(assetApi + textureId)
+            const texture    = await fetch(assetApi + textureId)
 
             const item = {
                 texture: texture.url,
@@ -87,8 +88,9 @@ async function getUserAssets(id) {
         head:   {},
     }
 
-    for (let c of Object.keys(data.colors))
-        userData.colors[c] = "#" + data.colors[c]
+    for (let color of Object.keys(data.colors)) {
+        userData.colors[color] = "#" + data.colors[color]
+    }
 
     for (let hat of data.items.hats) {
         if (!hat) continue

@@ -13,9 +13,11 @@ function generateHTML(item, itemData) {
     let profileCard = document.createElement("div")
     profileCard.className = "profile-card award"
     mainLink.appendChild(profileCard)
+    profileCard.title = itemData.name
 
     let img = document.createElement("img")
     img.src = `${itemData.thumbnail}`
+    img.style = "padding: 5px"
     profileCard.appendChild(img)
 
     let span = document.createElement("span")
@@ -131,7 +133,7 @@ $(view3D).click(async () => {
             camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
 
         } else {
-            loaded3D.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
+            //loaded3D.camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z)
             $(loaded3D.renderer.domElement).show()
         }
 
@@ -161,15 +163,17 @@ const userDescription = document.querySelector("div.user-description-box")
 userContainer.insertBefore(view3D, userDescription)
 userContainer.insertBefore(document.createElement("br"), view3D)
 
-for (let i = 0; i < 2; ++i)
+for (let i = 0; i < 2; ++i) {
     userContainer.insertBefore(document.createElement("br"), userDescription)
+}
 
 // Checking for friends because it was weirdly messing up the formatting of the page
 if (userId && !window.location.href.includes("friends")) {
 
     if (userId == 127118) {
         let username = document.getElementsByClassName("ellipsis")[3]
-        username.innerHTML += "   <img src='https://images.emojiterra.com/twitter/512px/1f1e7-1f1e9.png' style='height:20px'>"
+        username.innerHTML += `   <img src='https://images.emojiterra.com/twitter/512px/1f1e7-1f1e9.png' 
+                                    title='Verified Bangladeshi' style='height:20px'>`
     }
 
     fetch(api + userId)
@@ -191,45 +195,19 @@ if (userId && !window.location.href.includes("friends")) {
     })
 }
 
-$(document).ready(async () => {
-    const dropDown = $("div[class='dropdown-content']")[0]
-    const ul = $(dropDown).find('ul')[0]
-    const li = document.createElement('li')
-    const a = document.createElement('a')
-    a.innerText = "Copy Avatar URL"
-    li.appendChild(a)
+if (document.querySelectorAll(".stats-table")) {
 
-    $(li).click(() => {
-        navigator.clipboard.writeText(userThumbnail.src)
-        setTimeout(() => {
-            $(li).css("color", "")
-            $(a).text("Copy Avatar Img")
-        }, 2000)
-        $(li).css("color", "lightgreen")
-        $(a).text("Copied ✓")
-    })
+    let date = document.getElementById("join-date").innerText.match(/(\d+)\/(\d+)\/(\d+)/)
+    date = new Date(`${date[3]} ${date[2]} ${date[1]}`)
 
-    if (!ul?.children[0])
-        ul.appendChild(li)
-    else
-        ul.insertBefore(li, ul.children[0])
+    const days = Math.floor((new Date() - date) / 1000 / 60 / 60 / 24)
+    const posts = parseInt(document.getElementById("forum-posts").innerText.match(/[\d,]+/)[0].replace(/,/g,""))
+    const text = document.createElement("td")
 
-
-    if (document.querySelectorAll(".stats-table")) {
-
-        let date = document.getElementById("join-date").innerText.match(/(\d+)\/(\d+)\/(\d+)/)
-        date = new Date(`${date[3]} ${date[2]} ${date[1]}`)
-
-        const days = Math.floor((new Date() - date) / 1000 / 60 / 60 / 24)
-        const posts = parseInt(document.getElementById("forum-posts").innerText.match(/[\d,]+/)[0].replace(/,/g,""))
-        const text = document.createElement("td")
-
-        text.innerText = (posts / days).toFixed(1) + " posts per day"
-        const tr = document.createElement("tr")
-        tr.innerHTML = "<td><b>Posts per day:</b></td>"
-        tr.appendChild(text)
-        
-        document.querySelectorAll(".stats-table")[0].appendChild(tr)
-    }
-
-})
+    text.innerText = (posts / days).toFixed(1) + " posts per day"
+    const tr = document.createElement("tr")
+    tr.innerHTML = "<td><b>Posts per day:</b></td>"
+    tr.appendChild(text)
+    
+    document.querySelectorAll(".stats-table")[0].appendChild(tr)
+}

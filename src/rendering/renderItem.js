@@ -6,13 +6,35 @@ const lArmOBJ = browser.runtime.getURL("static/left_arm.obj")
 const rLegOBJ = browser.runtime.getURL("static/right_leg.obj")
 const lLegOBJ = browser.runtime.getURL("static/left_leg.obj")
 
-const yellow = "#F3B700"
-const gray = "#A7A7A7"
-const white = "#FFFFFF"
+function loadImage(path) {
+    const canvas = document.createElement("canvas")
+    canvas.style.position = "absolute"
+    canvas.style.top = "0"
+    canvas.style.left = "0"
+
+    const texture = new THREE.Texture(canvas);
+
+    const img = new Image();
+    img.crossOrigin =  ""
+    img.onload = function() {
+        canvas.width = img.width
+        canvas.height = img.height
+
+        const context = canvas.getContext("2d")
+        context.drawImage(img, 0, 0)
+
+        texture.needsUpdate = true
+    };
+    img.src = path
+    return texture
+};
 
 async function renderItem(itemID, container, type = "") {
     if (!itemID)
         return null
+
+    const config = await getConfig()
+    const colors = config.colors
 
     const itemData = await getAssetURL(itemID)
     const TextureLoader = new THREE.TextureLoader();
@@ -21,14 +43,23 @@ async function renderItem(itemID, container, type = "") {
 	const OBJloader = new THREE.OBJLoader();
 
     const scene = new THREE.Scene()
-    const light = new THREE.HemisphereLight(0xFFFFFF, 0xB1B1B1, 1);
+
+    const lightConfig = config.light
+    const light = new THREE.HemisphereLight(lightConfig.sky_color, lightConfig.ground_color, lightConfig.intensity);
     scene.add(light);
     
-    const camera = new THREE.PerspectiveCamera( 75, 1, 0.1, 1000 );
-    camera.position.set( -2.97, 5.085, 4.52 );
+    const cameraConfig = config.camera
+    const camera = new THREE.PerspectiveCamera(cameraConfig.fov, cameraConfig.aspect, cameraConfig.near, cameraConfig.far);
+    const cameraPosition = cameraConfig.position
+    camera.position.set(cameraPosition.x, cameraPosition.y, cameraPosition.z);
     
-    const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
-    renderer.setSize( 375, 375 );
+    const rendererConfig = config.renderer
+    const rendererSize = rendererConfig.size
+    const renderer = new THREE.WebGLRenderer({
+            antialias: rendererConfig.anti_alias, 
+            alpha:     rendererConfig.alpha
+        })
+    renderer.setSize(rendererSize.x, rendererSize.y);
     renderer.domElement.style = "display: none; user-select: none; width: 100%"
     $(renderer.domElement).attr('id', 'item-viewer')
 
@@ -68,54 +99,89 @@ async function renderItem(itemID, container, type = "") {
         })
     }
 
-    const mapOverlay = TextureLoader.load(itemData.texture);
-    const material = new THREE.MeshPhongMaterial({
-        map: mapOverlay,
-        side: THREE.DoubleSide
-    });
+    const mapOverlay = (type === "head") ? TextureLoader.load(config.merge_images.default_face) : TextureLoader.load(itemData.texture);
 
     switch (type.toLowerCase()) {
         case "face": {
-            quickLoad(headOBJ, yellow, true) 
+            quickLoad(headOBJ, colors.yellow, true) 
             break;
         }
         case "shirt": {
-            quickLoad(torsoOBJ, gray, true)
-            quickLoad(rArmOBJ, yellow)
-            quickLoad(lArmOBJ, yellow)
+            quickLoad(torsoOBJ, colors.gray, true)
+            quickLoad(rArmOBJ, colors.yellow)
+            quickLoad(lArmOBJ, colors.yellow)
             break
         }
         case "tshirt": {
-            quickLoad(torsoOBJ, gray, true, false)
+            const tshirtConfig = config.tshirt
+            quickLoad(torsoOBJ, colors.gray, true, false)
 
-            const geometry = new THREE.PlaneGeometry(2, 1.9, 1)
+            const geometryConfig = tshirtConfig.geometry
+            const geometry = new THREE.PlaneGeometry(geometryConfig.x, geometryConfig.y, geometryConfig.z)
             const plane = new THREE.Mesh(geometry, new THREE.MeshPhongMaterial({
                 map: mapOverlay,
                 transparent: true
             }))
 
             scene.add(plane)
-            plane.renderOrder = 3
-            plane.position.y = 3
-            plane.position.z = 0.5001
+            plane.renderOrder = tshirtConfig.render_order
+            plane.position.y = tshirtConfig.position.y
+            plane.position.z = tshirtConfig.position.z
 
-            quickLoad(rArmOBJ, yellow, false, false)
-            quickLoad(lArmOBJ, yellow, false, false)
+            quickLoad(rArmOBJ, colors.yellow, false, false)
+            quickLoad(lArmOBJ, colors.yellow, false, false)
             break
         }
         case "pants": {
-            quickLoad(torsoOBJ, gray, true)
-            quickLoad(rLegOBJ, white)
-            quickLoad(lLegOBJ, white)
+            quickLoad(torsoOBJ, colors.gray, true)
+            quickLoad(rLegOBJ, colors.white)
+            quickLoad(lLegOBJ, colors.white)
+            break
+        }
+        case "head": {
+            if (itemData.texture) {
+                const mergeImageConfig = config.merge_images
+                const mergeImagePosition = mergeImageConfig.image_position
+                mergeImages([
+                    { src: itemData.texture, x: 0, y: 0 },
+                    { src: mergeImageConfig.default_face, x: mergeImagePosition.x, y: mergeImagePosition.y}
+                ]).then(image => {
+                    parseOBJ(itemData.mesh, parsed => {
+                        const model = OBJloader.parse(parsed)
+                        model.traverse(child => {
+                            child.material = new THREE.MeshPhongMaterial({
+                                map: loadImage(image),
+                                transparent: true
+                            })
+
+                            box3D.setFromObject(child);
+                            box3D.center(controls.target);
+                            scene.add(child)
+
+                            const bodyColor = child.clone()
+                            bodyColor.material = new THREE.MeshPhongMaterial({
+                                color: colors.yellow
+                            })
+
+                            scene.add(bodyColor)
+                        })
+                    })
+                })
+                break
+            }
+
+            quickLoad(itemData.mesh, colors.yellow, true)
             break
         }
         default: {
             parseOBJ(itemData.mesh, parsed => {
                 let model = OBJloader.parse(parsed)
                 model.traverse(child => {
-                    child.material = material
+                    child.material = new THREE.MeshPhongMaterial({
+                        map: TextureLoader.load(itemData.texture),
+                        side: THREE.DoubleSide
+                    })
                 })
-
                 box3D.setFromObject(model);
                 box3D.center(controls.target);
                 scene.add(model)
@@ -125,14 +191,14 @@ async function renderItem(itemID, container, type = "") {
 
 
     // camera controls
+    const cameraControls = cameraConfig.controls
     var controls = new THREE.OrbitControls( camera, container );
-    controls.autoRotate = true;
-    controls.enableZoom = true;
-    controls.minDistance = 1;
-    controls.maxDistance = 10;
-    controls.enablePan = false
+    controls.autoRotate  = cameraControls.auto_rotate
+    controls.enableZoom  = cameraControls.enable_zoom
+    controls.minDistance = cameraControls.distance.min
+    controls.maxDistance = cameraControls.distance.max
+    controls.enablePan   = cameraControls.enable_pan 
     controls.update()
-    
     
     function animate() {
         controls.update()

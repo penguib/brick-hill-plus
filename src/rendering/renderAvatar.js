@@ -39,7 +39,7 @@ async function renderUser(userId, container, tryOnAsset = null) {
     const OBJLoader = new THREE.OBJLoader();
     const MTLLoader = new THREE.MTLLoader()
 
-    MTLLoader.setMaterialOptions({side: THREE.DoubleSide})
+    MTLLoader.setMaterialOptions({ side: THREE.DoubleSide })
 
     const quickLoad = (mesh, mat) => {
         OBJLoader.load(
@@ -62,26 +62,28 @@ async function renderUser(userId, container, tryOnAsset = null) {
     const userConfig = config.user
 
     const scene = new THREE.Scene()
-    // const light = new THREE.HemisphereLight(
-    //     userConfig.light.skyColor, 
-    //     userConfig.light.groundColor, 
-    //     userConfig.light.intensity
-    //     );
+    // const lightConfig = config.light
+    // const light = new THREE.HemisphereLight(lightConfig.skyColor, lightConfig.groundColor, lightConfig.intensity)
     // scene.add(light);
 
-    const directionalLight = new THREE.DirectionalLight( 0xffffff, 20 );
-    scene.add( directionalLight );
+    const ambientLight = new THREE.HemisphereLight(0xffffff, 0x202020, 1);
+    mainLight = new THREE.DirectionalLight(0xffffff, 0.5);
+    scene.add(ambientLight);
+   
+    // move the light back and up a bit
+    mainLight.position.set(10, 10, 10);
 
-    const camera = new THREE.PerspectiveCamera(
-        userConfig.camera.fov, 
-        userConfig.camera.aspect, 
-        userConfig.camera.near,
-        userConfig.camera.far
-        );
-    // camera.position.set(-2.33208, 105.217, -4.70999)
-    // camera.position.set( -2.97, 5.085, 4.52 );
+    // // remember to add the light to the scene
+    scene.add(ambientLight, mainLight);
 
-    const renderer = new THREE.WebGLRenderer({antialias: true, alpha: true});
+    const cameraConfig = config.camera
+    const camera = new THREE.PerspectiveCamera(cameraConfig.fov, cameraConfig.aspect, cameraConfig.near, cameraConfig.far)
+
+    const rendererConfig = config.renderer
+    const renderer = new THREE.WebGLRenderer({
+        antialias: rendererConfig.anti_alias, 
+        alpha:     rendererConfig.alpha 
+    })
 
     const headColor  = new THREE.MeshPhongMaterial({ color: userAssets.colors.head      })
     const torsoColor = new THREE.MeshPhongMaterial({ color: userAssets.colors.torso     })
@@ -90,12 +92,13 @@ async function renderUser(userId, container, tryOnAsset = null) {
     const rLegColor  = new THREE.MeshPhongMaterial({ color: userAssets.colors.right_leg })
     const lLegColor  = new THREE.MeshPhongMaterial({ color: userAssets.colors.left_leg  })
 
+    const controlsConfig = cameraConfig.controls
     const controls = new THREE.OrbitControls( camera, container );
-    controls.autoRotate = true;
-    controls.enableZoom = true;
-    controls.minDistance = 1;
-    controls.maxDistance = 10;
-    controls.enablePan = false
+    //controls.autoRotate  = controlsConfig.auto_rotate;
+    controls.enableZoom  = controlsConfig.enable_zoom;
+    controls.minDistance = controlsConfig.distance.min;
+    controls.maxDistance = controlsConfig.distance.max;
+    controls.enablePan   = controlsConfig.enable_pan 
     controls.update()
 
     MTLLoader.load(characterMat, mats => {
@@ -112,7 +115,7 @@ async function renderUser(userId, container, tryOnAsset = null) {
                             case "Head_Head_Head_Circle.000": {
                                 child.visible = false 
                                 const faceData = userAssets.face
-                                const faceMat = (tryOn?.type === "face") ? tryOn.texture : ((faceData) ? faceData.texture : "http://brkcdn.com/assets/default/face.png")
+                                const faceMat = (tryOn?.type === "face") ? tryOn.texture : ((faceData) ? faceData.texture : config.merge_images.default_face)
                                 const existsHead = (Object.keys(userAssets.head).length > 0) || tryOn?.type === "head"
 
                                 
@@ -121,22 +124,20 @@ async function renderUser(userId, container, tryOnAsset = null) {
 
                                     const model = (tryOn?.type === "head") ? tryOn : userAssets.head
                                     if (model.texture) {
+                                        const mergeImagePosition = config.merge_images.image_position
                                         mergeImages([
                                             { src: model.texture, x: 0, y: 0 },
-                                            { src: faceMat, x: 555, y: 31 }
+                                            { src: faceMat, x: mergeImagePosition.x, y: mergeImagePosition.y }
                                         ]).then(imageB64 => {
                                             parseOBJ(model.mesh, parsed => {
                                                 let m = OBJLoader.parse(parsed)
-                                                m.traverse(c => {
-                                                    c.material =  new THREE.MeshPhongMaterial({
+                                                m.traverse(child => {
+                                                    child.material =  new THREE.MeshPhongMaterial({
                                                         map: loadImage(imageB64),
                                                         transparent: true,
                                                         side: THREE.DoubleSide,
-        
-                                                        // am i supposed to use color for gingerbread head?
-                                                        //color: userAssets.colors.head
                                                     })
-                                                    scene.add(c)
+                                                    scene.add(child)
                                                 })
                                             })
                                         })
@@ -255,16 +256,32 @@ async function renderUser(userId, container, tryOnAsset = null) {
                                         studs.position.y = studs.position.z = 3.5
                                     }
                                 }
+                               
                                 
                                 let bodyColor = child.clone()
-                                bodyColor.material = rArmColor
-                                bodyColor.renderOrder = 2
-                                scene.add(bodyColor)
+                                bodyColor.material = rArmColor 
 
                                 if (userAssets.tool || tryOn?.type === "tool") {
-                                    bodyColor.rotation.x = child.rotation.x = -Math.PI / 2;
-                                    bodyColor.position.y = bodyColor.position.z =  child.position.y = child.position.z = 3.5
+                                    child.rotation.x = -3 * Math.PI / 2;
+                                    child.rotation.y = Math.PI
+                                    child.rotation.z = Math.PI;
+
+                                    child.position.y = 3.5
+                                    child.position.x = 0
+                                    child.position.z = 3.5    
                                 }
+
+                                if (userAssets.tool || tryOn?.type === "tool") {
+                                    bodyColor.rotation.x = child.rotation.x
+                                    bodyColor.rotation.y = child.rotation.y
+                                    bodyColor.rotation.z = child.rotation.z
+
+                                    bodyColor.position.y = child.position.y
+                                    bodyColor.position.x = child.position.x
+                                    bodyColor.position.z = child.position.z
+                                }
+                                scene.add(bodyColor)
+
 
                                 break
                             }
@@ -340,7 +357,9 @@ async function renderUser(userId, container, tryOnAsset = null) {
                                 // Render the t-shirt here with the torso
                                 const tshirtData = userAssets.tshirt
                                 if (tshirtData || tryOn?.type === "tshirt") {
-                                    const geometry = new THREE.PlaneGeometry( 2, 1.9, 1 );
+                                    const tshirtConfig = config.tshirt
+                                    const tshirtGeometry = tshirtConfig.geometry
+                                    const geometry = new THREE.PlaneGeometry(tshirtGeometry.x, tshirtGeometry.y, tshirtGeometry.z);
                                     const tShirtMat = TextureLoader.load( (tryOn?.type === "tshirt") ? tryOn.texture : tshirtData.texture  )
                                     const material = new THREE.MeshBasicMaterial({
                                         map: tShirtMat,
@@ -349,9 +368,9 @@ async function renderUser(userId, container, tryOnAsset = null) {
                                     const plane = new THREE.Mesh( geometry, material );
                                     scene.add( plane );
 
-                                    plane.renderOrder = 3
-                                    plane.position.y = 3 
-                                    plane.position.z = 0.5001
+                                    plane.renderOrder = tshirtConfig.render_order
+                                    plane.position.y = tshirtConfig.position.y
+                                    plane.position.z = tshirtConfig.position.z
                                 }
 
                                 let bodyColor = child.clone()

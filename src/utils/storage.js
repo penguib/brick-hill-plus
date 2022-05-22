@@ -46,6 +46,11 @@ const storageKeys = {
             name: "",
             link: ""    
         }
+    },
+
+    "n_ColoredIcons": {
+        default: true,
+        null: false
     }
 } 
 
@@ -125,5 +130,24 @@ const storage = {
 
     nullProps: key => {
         fillProps(key, true)
+    },
+
+    setNotifierSettings: settings => {
+        let settingsField = 0x0
+
+        for (setting in settings) {
+            const val = Number(settings[setting].checked)
+            settingsField |= val << setting
+        }
+
+        return settingsField
+    },
+
+    notifierConstants: {
+        specials:     1 << 0,
+        newItems:     1 << 1,
+        updatedItems: 1 << 2,
+        tweets:       1 << 3,
+        firstItem:    1 << 4,
     }
 }

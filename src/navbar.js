@@ -1,8 +1,3 @@
-const bhpSettings = storage.get("bhp-settings")
-
-if (!storage.checkProps("bhp-settings"))
-    storage.fillProps("bhp-settings")
-
 const customButton = bhpSettings.n_CustomButton
 if (customButton.name && customButton.link) {
 
@@ -18,9 +13,25 @@ if (customButton.name && customButton.link) {
     navbar[0].appendChild(li)
 }
 
-console.log(storage.get("bhp-settings"));
 let mainDiv = document.getElementsByClassName("bottom-bar")
 
-// If the user is logged in
+// If the user is logged in because there isn't a bottom navbar if they aren't
 if (mainDiv[0])
-    mainDiv[0].childNodes[0].nextSibling.innerHTML += "<li><a href='https://discord.gg/brick-hill'>Discord</a></li>"
+    mainDiv[0].childNodes[0].nextSibling.innerHTML += `<li>
+                                                        <a href='https://www.brick-hill.com/promocodes'>Promocodes</a>
+                                                       </li>
+                                                       <li>
+                                                        <a href='https://discord.gg/brick-hill'>Discord</a>
+                                                       </li>`;
+
+if (bhpSettings.n_ColoredIcons) {
+    const info = document.querySelector(".info")
+    const children = info.children
+
+    for (let element of children) {
+        const icon = element.querySelector("span")
+        if (icon.classList.contains("img-white")) {
+            icon.classList.remove("img-white")
+        }
+    }
+}

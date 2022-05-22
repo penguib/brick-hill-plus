@@ -1,3 +1,4 @@
 *.zip
 *.txt
 lib/.DS_Store
+src/settings.json
